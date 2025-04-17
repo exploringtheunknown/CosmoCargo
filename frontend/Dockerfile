@@ -13,25 +13,33 @@ RUN echo '{"name":"CosmoCargo","short_name":"CosmoCargo","icons":[{"src":"/favic
 # Skapa en tom favicon.ico
 RUN touch public/favicon.ico
 
-FROM base AS builder
+# Build stage
+FROM node:22-alpine AS build
+
+# Define build arguments
+ARG NEXT_PUBLIC_API_URL
+ARG NODE_ENV=production
+
+# Set environment variables
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NODE_ENV=$NODE_ENV
+
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/public ./public
+COPY package*.json ./
+RUN npm ci
+
+# Create necessary public files
+COPY public ./public
 COPY . .
 RUN npm run build
 
-FROM base AS runner
+# Runtime stage
+FROM node:22-alpine
 WORKDIR /app
-
-ENV NODE_ENV production
-
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/node_modules ./node_modules
 
 EXPOSE 3000
-
-ENV PORT 3000
-
 CMD ["npm", "start"] 

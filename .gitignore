@@ -1,1 +1,20 @@
+# Dependencies
 /node_modules
+**/node_modules
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build outputs
+**/bin
+**/obj
+**/.next
+**/dist
+
+# IDE files
+.vs
+.vscode
+*.suo
+*.user

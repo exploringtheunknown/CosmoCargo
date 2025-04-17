@@ -6,7 +6,8 @@ services:
       context: ../frontend
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:5000}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:5000}
+        NODE_ENV: ${NODE_ENV:-development}
     ports:
       - "3000:3000"
     depends_on:
@@ -24,9 +25,10 @@ services:
       context: ../backend
       dockerfile: Dockerfile
       args:
-        - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+        ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+        CONNECTION_STRING: ${CONNECTION_STRING:-Host=db;Port=5432;Database=cosmocargo;Username=postgres;Password=postgres}
     ports:
-      - "5001:5001"
+      - "5000:5000"
     depends_on:
       - db
     volumes:
@@ -37,7 +39,7 @@ services:
   db:
     image: postgres:15
     ports:
-      - "5433:5433"
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}

@@ -1,20 +1,20 @@
+# Build stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+
+ARG ASPNETCORE_ENVIRONMENT
+ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
+
 WORKDIR /src
-
-# Kopiera csproj och återställ beroenden
-COPY *.csproj ./
+COPY ["*.csproj", "./"]
 RUN dotnet restore
+COPY . .
+RUN dotnet publish -c Release -o /app/publish
 
-# Kopiera resten av filerna och bygg
-COPY . ./
-RUN dotnet publish -c Release -o /app
-
-# Bygg runtime-image
+# Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
-COPY --from=build /app ./
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "CosmoCargo.dll"]
 
 EXPOSE 5000
 ENV ASPNETCORE_URLS=http://+:5000
-
-ENTRYPOINT ["dotnet", "CosmoCargo.dll"]

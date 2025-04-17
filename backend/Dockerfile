@@ -1,8 +1,13 @@
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 
-ARG ASPNETCORE_ENVIRONMENT
+# Define build arguments
+ARG ASPNETCORE_ENVIRONMENT=Development
+ARG CONNECTION_STRING
+
+# Set environment variables
 ENV ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT
+ENV ConnectionStrings__DefaultConnection=$CONNECTION_STRING
 
 WORKDIR /src
 COPY ["*.csproj", "./"]

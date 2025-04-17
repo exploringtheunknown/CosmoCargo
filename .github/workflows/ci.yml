@@ -2,7 +2,7 @@ name: CosmoCargo CI
 
 on:
   push:
-    branches: [ main, infrastructure-setup ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 

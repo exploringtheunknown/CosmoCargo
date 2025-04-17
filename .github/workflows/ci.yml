@@ -74,12 +74,3 @@ jobs:
           docker push ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
           docker push ghcr.io/${{ github.repository }}/frontend:latest
           docker push ghcr.io/${{ github.repository }}/backend:latest
-
-  deploy-production:
-    needs: build-docker
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment: production
-    steps:
-      - name: Deploy to production
-        run: echo "Här kommer din production deployment-logik"

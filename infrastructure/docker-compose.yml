@@ -3,44 +3,45 @@ version: '3.8'
 services:
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:5000}
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:5000
     depends_on:
       - backend
     volumes:
-      - ./frontend:/app
+      - ../frontend:/app
       - /app/node_modules
       - /app/.next
+    environment:
+      - DOCKER_CLIENT_TIMEOUT=120
+      - COMPOSE_HTTP_TIMEOUT=120
 
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
+      args:
+        - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
     ports:
-      - "5000:5000"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=db;Database=cosmocargo;Username=postgres;Password=postgres
+      - "5001:5001"
     depends_on:
       - db
     volumes:
-      - ./backend:/src
+      - ../backend:/src
       - /src/obj
       - /src/bin
 
   db:
     image: postgres:15
     ports:
-      - "5432:5432"
+      - "5433:5433"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=cosmocargo
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-cosmocargo}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -52,10 +53,10 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     ports:
-      - "5050:80"
+      - "5051:80"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@cosmocargo.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@cosmocargo.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
     depends_on:
       - db
     volumes:

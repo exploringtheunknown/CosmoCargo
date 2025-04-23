@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import ClientProviders from "@/components/ClientProviders";
 import React from "react";
+import { QueryProvider } from '../lib/query-provider';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang="sv">
       <body className={inter.className}>
-        <ClientProviders>{children}</ClientProviders>
+        <QueryProvider>
+          <ClientProviders>{children}</ClientProviders>
+        </QueryProvider>
       </body>
     </html>
   );

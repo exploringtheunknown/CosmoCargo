@@ -11,42 +11,29 @@ import {
 import { Package, Search, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useQuery } from '@tanstack/react-query';
+import { fetchShipments } from '../../../lib/api-services';
 
-// Sample data
-const shipments = [
-  {
-    id: "SC-1234567",
-    from: "Jorden, Alpha Station",
-    to: "Mars, Olympus Station",
-    date: "2023-04-10",
-    status: "I transit",
-    progress: 60,
-    pilot: "Anna Karlsson",
-    ship: "Stellar Phoenix IX",
-  },
-  {
-    id: "SC-7654321",
-    from: "Jorden, Beta Station",
-    to: "Europa, Ice Harbor",
-    date: "2023-04-12",
-    status: "Förbereder",
-    progress: 20,
-    pilot: "Marcus Lindqvist",
-    ship: "Quantum Voyager",
-  },
-  {
-    id: "SC-9876543",
-    from: "Mars, Olympus Station",
-    to: "Jorden, Gamma Station",
-    date: "2023-04-08",
-    status: "Närmar sig destination",
-    progress: 85,
-    pilot: "Elsa Berg",
-    ship: "Nebula Sprinter",
-  },
-];
+interface Shipment {
+  id: string;
+  from: string;
+  to: string;
+  date: string;
+  status: string;
+  progress: number;
+  pilot: string;
+  ship: string;
+}
 
 const OngoingShipments = () => {
+  const { data: shipments = [], error, isLoading } = useQuery<Shipment[], Error>({
+    queryKey: ['shipments'],
+    queryFn: fetchShipments
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading shipments</div>;
+
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-6">

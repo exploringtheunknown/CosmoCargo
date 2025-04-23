@@ -35,43 +35,8 @@ import {
   XCircle,
   Plane,
 } from "lucide-react";
-
-// Mock data for shipments
-const MOCK_SHIPMENTS = [
-  {
-    id: "SHIP-1001",
-    customer: "Johan Andersson",
-    origin: "Stockholm, Sweden",
-    destination: "Lunar Colony Alpha",
-    scheduledDate: "2025-04-25",
-    status: "pending_approval",
-    cargo: "Scientific Equipment",
-    weight: "250kg",
-    pilot: null,
-  },
-  {
-    id: "SHIP-1002",
-    customer: "Maria Johansson",
-    origin: "Gothenburg, Sweden",
-    destination: "Mars Base One",
-    scheduledDate: "2025-04-28",
-    status: "approved",
-    cargo: "Medical Supplies",
-    weight: "180kg",
-    pilot: null,
-  },
-  {
-    id: "SHIP-1003",
-    customer: "Erik Nilsson",
-    origin: "Malmö, Sweden",
-    destination: "Titan Research Station",
-    scheduledDate: "2025-05-02",
-    status: "assigned",
-    cargo: "Construction Materials",
-    weight: "500kg",
-    pilot: "Lars Svensson",
-  },
-];
+import { fetchShipments, Shipment } from '../../../lib/api-services';
+import { useQuery } from '@tanstack/react-query';
 
 // Mock data for pilots
 const MOCK_PILOTS = [
@@ -89,17 +54,23 @@ const statusMap = {
 };
 
 const ShipmentManagement = () => {
+  const { data: shipments = [], error, isLoading } = useQuery<Shipment[], Error>({
+    queryKey: ['shipments'],
+    queryFn: fetchShipments
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading shipments</div>;
+
   const { user } = useAuth();
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
-  const [selectedShipment, setSelectedShipment] = useState<
-    (typeof MOCK_SHIPMENTS)[0] | null
-  >(null);
+  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [selectedPilot, setSelectedPilot] = useState<string>("");
 
   const handleAction = (
-    shipment: (typeof MOCK_SHIPMENTS)[0],
+    shipment: Shipment,
     action: "approve" | "reject" | "assign"
   ) => {
     setSelectedShipment(shipment);
@@ -178,7 +149,7 @@ const ShipmentManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {MOCK_SHIPMENTS.map((shipment) => (
+            {shipments.map((shipment) => (
               <TableRow key={shipment.id}>
                 <TableCell className="font-medium">{shipment.id}</TableCell>
                 <TableCell>{shipment.customer}</TableCell>

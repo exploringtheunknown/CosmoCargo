@@ -14,37 +14,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Rocket, CheckCircle, AlertCircle } from "lucide-react";
-
-// Mock data for assigned shipments
-const MOCK_ASSIGNED_SHIPMENTS = [
-  {
-    id: "SHIP-1001",
-    customer: "Johan Andersson",
-    origin: "Stockholm, Sweden",
-    destination: "Lunar Colony Alpha",
-    scheduledDate: "2025-04-25",
-    status: "pending",
-    cargo: "Scientific Equipment",
-  },
-  {
-    id: "SHIP-1002",
-    customer: "Maria Johansson",
-    origin: "Gothenburg, Sweden",
-    destination: "Mars Base One",
-    scheduledDate: "2025-04-28",
-    status: "in_transit",
-    cargo: "Medical Supplies",
-  },
-  {
-    id: "SHIP-1003",
-    customer: "Erik Nilsson",
-    origin: "Malmö, Sweden",
-    destination: "Titan Research Station",
-    scheduledDate: "2025-05-02",
-    status: "pending",
-    cargo: "Construction Materials",
-  },
-];
+import { fetchShipments, Shipment } from '../../../lib/api-services';
+import { useQuery } from '@tanstack/react-query';
 
 const statusMap = {
   pending: { label: "Väntande", color: "bg-amber-500" },
@@ -55,6 +26,13 @@ const statusMap = {
 
 const AssignedShipments = () => {
   const { user } = useAuth();
+  const { data: shipments = [], error, isLoading } = useQuery<Shipment[], Error>({
+    queryKey: ['assignedShipments'],
+    queryFn: fetchShipments
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading shipments</div>;
 
   const handleUpdateStatus = (shipmentId: string, newStatus: string) => {
     toast.success(
@@ -94,7 +72,7 @@ const AssignedShipments = () => {
         </div>
       </div>
 
-      {MOCK_ASSIGNED_SHIPMENTS.length > 0 ? (
+      {shipments.length > 0 ? (
         <div className="rounded-md border border-space-secondary bg-space-primary">
           <Table>
             <TableHeader>
@@ -110,7 +88,7 @@ const AssignedShipments = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {MOCK_ASSIGNED_SHIPMENTS.map((shipment) => (
+              {shipments.map((shipment) => (
                 <TableRow key={shipment.id}>
                   <TableCell className="font-medium">{shipment.id}</TableCell>
                   <TableCell>{shipment.customer}</TableCell>

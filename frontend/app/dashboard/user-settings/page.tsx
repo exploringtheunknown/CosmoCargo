@@ -34,7 +34,7 @@ const UserSettings = () => {
       }
 
       toast.success("Profil uppdaterad");
-    } catch (error) {
+    } catch {
       toast.error("Ett fel uppstod vid uppdatering av profilen");
     } finally {
       setIsLoading(false);

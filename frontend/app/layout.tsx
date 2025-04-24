@@ -8,7 +8,7 @@ import { QueryProvider } from '../lib/query-provider';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CosmoCargo™ – Intergalaktisk Fraktcentral",
+  title: "CosmoCargo™ - Intergalaktisk Fraktcentral",
   description: "Den ledande aktören inom rymdlogistik",
 };
 

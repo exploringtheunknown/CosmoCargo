@@ -36,7 +36,7 @@ const FAQ = () => {
                 </h3>
                 <p className="text-space-text-secondary">
                   Du kan spåra din frakt genom att logga in på ditt
-                  CosmoCargo™-konto och navigera till "Pågående Leveranser"
+                  CosmoCargo™-konto och navigera till &quot;Pågående Leveranser&quot;
                   eller genom att ange ditt spårningsnummer i spårningsverktyget
                   på vår hemsida. Vi erbjuder realtidsuppdateringar med exakt
                   position och beräknad ankomsttid.
@@ -65,7 +65,7 @@ const FAQ = () => {
                   destination, samt vald fraktmetod. Våra standardleveranser
                   mellan närliggande planeter tar vanligtvis 2-5 dagar, medan
                   interstellära frakter kan ta 7-21 dagar. För brådskande behov
-                  erbjuder vi vår "Hyperspace Express" som kan leverera inom
+                  erbjuder vi vår &quot;Hyperspace Express&quot; som kan leverera inom
                   samma system på under 24 timmar.
                 </p>
               </div>

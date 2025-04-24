@@ -12,7 +12,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Package, ArrowRight } from "lucide-react";
 
 const BookShipment = () => {

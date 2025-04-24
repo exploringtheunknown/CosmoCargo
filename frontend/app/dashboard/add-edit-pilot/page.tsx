@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {
@@ -28,6 +28,7 @@ import { AlertCircle, ArrowLeft, Save } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 // Define the form schema with zod
 const pilotFormSchema = z.object({
@@ -36,7 +37,7 @@ const pilotFormSchema = z.object({
     .min(2, { message: "Pilotens namn måste vara minst 2 tecken." }),
   email: z.string().email({ message: "Vänligen ange en giltig e-postadress." }),
   experience: z.string().min(1, { message: "Vänligen ange erfarenhet." }),
-  isActive: z.boolean().default(true),
+  isActive: z.boolean(),
   password: z
     .string()
     .min(8, { message: "Lösenordet måste vara minst 8 tecken." })
@@ -80,7 +81,7 @@ type PilotFormValues = z.infer<typeof pilotFormSchema>;
 
 const AddEditPilot = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { id } = useParams();
   const isEditMode = !!id;
 
@@ -111,10 +112,10 @@ const AddEditPilot = () => {
         });
       } else {
         toast.error("Kunde inte hitta piloten");
-        navigate("/dashboard/pilots");
+        router.push("/dashboard/pilots");
       }
     }
-  }, [id, isEditMode, navigate, form]);
+  }, [id, isEditMode, router, form]);
 
   // Handle form submission
   const onSubmit = (data: PilotFormValues) => {
@@ -128,7 +129,7 @@ const AddEditPilot = () => {
       toast.success(`Piloten ${data.name} har lagts till`);
     }
 
-    navigate("/dashboard/pilots");
+    router.push("/dashboard/pilots");
   };
 
   // Check for admin access
@@ -151,7 +152,7 @@ const AddEditPilot = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate("/dashboard/pilots")}
+          onClick={() => router.push("/dashboard/pilots")}
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Tillbaka
@@ -176,7 +177,7 @@ const AddEditPilot = () => {
                 <FormField
                   control={form.control}
                   name="name"
-                  render={({ field }: { field: any }) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Namn</FormLabel>
                       <FormControl>
@@ -194,7 +195,7 @@ const AddEditPilot = () => {
                 <FormField
                   control={form.control}
                   name="email"
-                  render={({ field }: { field: any }) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>E-post</FormLabel>
                       <FormControl>
@@ -213,7 +214,7 @@ const AddEditPilot = () => {
                 <FormField
                   control={form.control}
                   name="experience"
-                  render={({ field }: { field: any }) => (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>Erfarenhet</FormLabel>
                       <FormControl>
@@ -232,7 +233,7 @@ const AddEditPilot = () => {
                   <FormField
                     control={form.control}
                     name="password"
-                    render={({ field }: { field: any }) => (
+                    render={({ field }) => (
                       <FormItem>
                         <FormLabel>Lösenord</FormLabel>
                         <FormControl>
@@ -254,7 +255,7 @@ const AddEditPilot = () => {
                   <FormField
                     control={form.control}
                     name="password"
-                    render={({ field }: { field: any }) => (
+                    render={({ field }) => (
                       <FormItem>
                         <FormLabel>Nytt Lösenord (valfritt)</FormLabel>
                         <FormControl>
@@ -278,7 +279,7 @@ const AddEditPilot = () => {
               <FormField
                 control={form.control}
                 name="isActive"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border border-space-secondary p-4">
                     <FormControl>
                       <Checkbox
@@ -301,7 +302,7 @@ const AddEditPilot = () => {
                   type="button"
                   variant="outline"
                   className="mr-2"
-                  onClick={() => navigate("/dashboard/pilots")}
+                  onClick={() => router.push("/dashboard/pilots")}
                 >
                   Avbryt
                 </Button>

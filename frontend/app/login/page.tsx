@@ -15,7 +15,6 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card";
 import { Lock, User, LogIn } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -27,9 +26,6 @@ const Login = () => {
   const router = useRouter();
   const { login } = useAuth();
 
-  // Where to redirect after login
-  const redirectPath = "/dashboard";
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -37,8 +33,7 @@ const Login = () => {
     try {
       const success = await login(email, password);
       if (success) {
-        // Redirect them to the dashboard
-        router.push(redirectPath);
+        router.push("/dashboard");
       }
     } finally {
       setIsLoading(false);
@@ -74,6 +69,7 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    autoComplete="email"
                   />
                 </div>
               </div>
@@ -91,6 +87,7 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    autoComplete="current-password"
                   />
                 </div>
               </div>

@@ -260,9 +260,6 @@ const DashboardOverview: React.FC = () => {
                     content={({
                       active,
                       payload,
-                    }: {
-                      active?: boolean;
-                      payload?: any[];
                     }) => {
                       if (active && payload && payload.length) {
                         return (
@@ -436,9 +433,6 @@ const DashboardOverview: React.FC = () => {
                     content={({
                       active,
                       payload,
-                    }: {
-                      active?: boolean;
-                      payload?: any[];
                     }) => {
                       if (active && payload && payload.length) {
                         return (

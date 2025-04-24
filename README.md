@@ -42,7 +42,7 @@ cd cosmocargo
 
 2. Starta hela applikationen med Docker Compose:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 3. Applikationen är nu tillgänglig på:
@@ -60,6 +60,7 @@ npm run dev
 
 ### Köra backend separat
 ```bash
+docker compose up db -d
 cd backend
 dotnet restore
 dotnet run
@@ -82,7 +83,6 @@ dotnet test
 cosmocargo/
 ├── frontend/           # Next.js React-applikation
 ├── backend/            # .NET Minimal API
-├── infrastructure/     # IaC-filer
 ├── docker-compose.yml  # Docker Compose-konfiguration
 └── README.md           # Projektdokumentation
 ```

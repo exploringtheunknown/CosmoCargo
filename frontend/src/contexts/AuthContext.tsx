@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { api } from "../services/api";
-
+import { UserRole } from "../model/types";
 interface User {
   email: string;
   name: string;
@@ -21,6 +21,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const mapRoleToFrontend = (backendRole: UserRole | string | number): 'customer' | 'pilot' | 'admin' => {
+  
+  if (typeof backendRole === 'number') {
+    switch (backendRole) {
+      case 0: return 'customer';
+      case 1: return 'pilot';
+      case 2: return 'admin';
+      default: return 'customer';
+    }
+  }
+  
+  const normalizedRole = String(backendRole).trim().toLowerCase();
+  
+  if (normalizedRole.includes('admin')) return 'admin';
+  if (normalizedRole.includes('pilot')) return 'pilot';
+  if (normalizedRole.includes('customer')) return 'customer';
+  
+  return 'customer';
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
@@ -28,7 +48,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const router = useRouter();
 
-  // Check for stored auth on initial load
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -55,11 +74,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error('Failed to fetch user data');
       }
       
-      const user = userResponse.data;
-      setUser(user);
+      const userData = userResponse.data;
+      
+      const frontendRole = mapRoleToFrontend(userData.role);
+      
+      setUser({
+        ...userData,
+        role: frontendRole
+      });
       setIsAuthenticated(true);
-      localStorage.setItem("user", JSON.stringify(user));
-      toast.success(`Välkommen, ${user.name}!`);
+      localStorage.setItem("user", JSON.stringify(userData));
+      toast.success(`Välkommen, ${userData.name}!`);
       return true;
     } catch {
       toast.error("Felaktiga inloggningsuppgifter");

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CosmoCargo.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,16 +36,22 @@ namespace CosmoCargo.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     customer_id = table.Column<Guid>(type: "uuid", nullable: false),
                     pilot_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    origin = table.Column<string>(type: "text", nullable: false),
-                    destination = table.Column<string>(type: "text", nullable: false),
                     weight = table.Column<decimal>(type: "numeric", nullable: false),
-                    cargo = table.Column<string>(type: "text", nullable: false),
+                    category = table.Column<string>(type: "text", nullable: false),
                     priority = table.Column<string>(type: "text", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
+                    has_insurance = table.Column<bool>(type: "boolean", nullable: false),
                     status = table.Column<int>(type: "integer", nullable: false),
-                    risk_level = table.Column<int>(type: "integer", nullable: false),
-                    scheduled_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    receiver_email = table.Column<string>(type: "text", nullable: false),
+                    receiver_name = table.Column<string>(type: "text", nullable: false),
+                    receiver_planet = table.Column<string>(type: "text", nullable: false),
+                    receiver_station = table.Column<string>(type: "text", nullable: false),
+                    sender_email = table.Column<string>(type: "text", nullable: false),
+                    sender_name = table.Column<string>(type: "text", nullable: false),
+                    sender_planet = table.Column<string>(type: "text", nullable: false),
+                    sender_station = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {

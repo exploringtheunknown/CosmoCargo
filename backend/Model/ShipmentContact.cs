@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace CosmoCargo.Model
 {
     public class ShipmentContact

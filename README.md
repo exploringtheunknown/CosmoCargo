@@ -35,7 +35,7 @@
 
 1. Starta hela applikationen med Docker Compose:
 ```bash
-docker compose watch
+docker compose up --detach --build
 ```
 
 2. Vänta på seedningen av databasen (endast första gången):

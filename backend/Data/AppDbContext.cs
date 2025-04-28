@@ -43,24 +43,25 @@ namespace CosmoCargo.Data
 
             modelBuilder.Entity<Shipment>(entity =>
             {
+                entity.ToTable("shipments");
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 
                 // Configure owned entity types
-                entity.OwnsOne(e => e.Sender, sender =>
+                entity.ComplexProperty(e => e.Sender, sender =>
                 {
-                    sender.Property(s => s.Name).IsRequired();
-                    sender.Property(s => s.Email).IsRequired();
-                    sender.Property(s => s.Planet).IsRequired();
-                    sender.Property(s => s.Station).IsRequired();
+                    sender.Property(s => s.Name).IsRequired().HasColumnName("sender_name");
+                    sender.Property(s => s.Email).IsRequired().HasColumnName("sender_email");
+                    sender.Property(s => s.Planet).IsRequired().HasColumnName("sender_planet");
+                    sender.Property(s => s.Station).IsRequired().HasColumnName("sender_station");
                 });
                 
-                entity.OwnsOne(e => e.Receiver, receiver =>
+                entity.ComplexProperty(e => e.Receiver, receiver =>
                 {
-                    receiver.Property(r => r.Name).IsRequired();
-                    receiver.Property(r => r.Email).IsRequired();
-                    receiver.Property(r => r.Planet).IsRequired();
-                    receiver.Property(r => r.Station).IsRequired();
+                    receiver.Property(r => r.Name).IsRequired().HasColumnName("receiver_name");
+                    receiver.Property(r => r.Email).IsRequired().HasColumnName("receiver_email");
+                    receiver.Property(r => r.Planet).IsRequired().HasColumnName("receiver_planet");
+                    receiver.Property(r => r.Station).IsRequired().HasColumnName("receiver_station");
                 });
                 
                 // Package information

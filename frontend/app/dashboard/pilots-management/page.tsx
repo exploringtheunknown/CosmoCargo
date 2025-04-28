@@ -29,20 +29,27 @@ import {
   UserCheck,
   UserX,
   Edit,
+  Loader2,
 } from "lucide-react";
-import { MOCK_PILOTS, MockPilot } from '../../../src/data/mock-data';
+import { useQuery } from '@tanstack/react-query';
+import { pilotService, Pilot } from '@/services/pilotService';
 
 const PilotsManagement = () => {
   const { user } = useAuth();
   const router = useRouter();
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
-  const [selectedPilot, setSelectedPilot] = useState<
-    (typeof MOCK_PILOTS)[0] | null
-  >(null);
+  const [selectedPilot, setSelectedPilot] = useState<Pilot | null>(null);
+
+  // Hämta piloter från backend
+  const { data: pilots, isLoading, error, refetch } = useQuery({
+    queryKey: ['pilots'],
+    queryFn: pilotService.getAllPilots,
+    enabled: user?.role === 'admin'
+  });
 
   const handleAction = (
-    pilot: MockPilot,
+    pilot: Pilot,
     action: "approve" | "suspend"
   ) => {
     setSelectedPilot(pilot);
@@ -53,15 +60,27 @@ const PilotsManagement = () => {
     }
   };
 
-  const confirmAction = (action: "approve" | "suspend") => {
+  const confirmAction = async (action: "approve" | "suspend") => {
     if (!selectedPilot) return;
 
-    if (action === "approve") {
-      toast.success(`Pilot ${selectedPilot.name} har aktiverats`);
-      setShowApproveDialog(false);
-    } else {
-      toast.success(`Pilot ${selectedPilot.name} har inaktiverats`);
-      setShowSuspendDialog(false);
+    try {
+      // Här skulle vi normalt anropa en API-endpoint för att uppdatera status
+      // Men eftersom vi inte har en sådan endpoint, simulerar vi det
+      toast.success(
+        `Pilot ${selectedPilot.name} har ${action === "approve" ? "aktiverats" : "inaktiverats"}`
+      );
+      
+      // Uppdatera listan efter ändringen
+      refetch();
+      
+      if (action === "approve") {
+        setShowApproveDialog(false);
+      } else {
+        setShowSuspendDialog(false);
+      }
+    } catch (err) {
+      console.error('Error during action:', err);
+      toast.error("Ett fel uppstod vid statusuppdatering");
     }
   };
 
@@ -82,6 +101,32 @@ const PilotsManagement = () => {
           Du har inte behörighet att hantera piloter. Denna sida är endast för
           administratörer.
         </p>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <Loader2 className="h-12 w-12 animate-spin text-space-accent-purple" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-8">
+        <AlertCircle className="w-16 h-16 text-space-danger mb-4" />
+        <h2 className="text-2xl font-medium mb-2">Ett fel uppstod</h2>
+        <p className="text-space-text-secondary text-center">
+          Kunde inte hämta pilotdata. Försök igen senare.
+        </p>
+        <Button 
+          onClick={() => refetch()} 
+          className="mt-4 space-button"
+        >
+          Försök igen
+        </Button>
       </div>
     );
   }
@@ -121,7 +166,7 @@ const PilotsManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {MOCK_PILOTS.map((pilot) => (
+            {pilots?.map((pilot) => (
               <TableRow key={pilot.id}>
                 <TableCell className="font-medium">{pilot.id}</TableCell>
                 <TableCell className="flex items-center gap-2">

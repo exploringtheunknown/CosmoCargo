@@ -34,7 +34,6 @@ const EditPilotPage = () => {
 
   const pilotId = params.id as string;
 
-  // Redirect if not admin
   useEffect(() => {
     if (user && user.role !== "admin") {
       router.push("/dashboard");
@@ -42,7 +41,6 @@ const EditPilotPage = () => {
     }
   }, [user, router]);
 
-  // Fetch pilot data
   useEffect(() => {
     const fetchPilot = async () => {
       try {
@@ -91,12 +89,10 @@ const EditPilotPage = () => {
     try {
       setIsSubmitting(true);
       
-      // Update pilot status if changed
       if (pilot && pilot.status !== formData.status) {
-        await pilotService.updatePilotStatus(pilotId, formData.status);
+        await pilotService.updatePilotStatus(pilotId, formData.status as "Active" | "Inactive");
       }
       
-      // Update pilot info
       await pilotService.updatePilot(pilotId, {
         name: formData.name,
         email: formData.email,

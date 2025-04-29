@@ -22,26 +22,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const mapRoleToFrontend = (backendRole: number): 'customer' | 'pilot' | 'admin' => {
-  
-  if (typeof backendRole === 'number') {
-    switch (backendRole) {
-      case 0: return 'customer';
-      case 1: return 'pilot';
-      case 2: return 'admin';
-      default: return 'customer';
-    }
-  }
-  
-  const normalizedRole = String(backendRole).trim().toLowerCase();
-  
-  if (normalizedRole.includes('admin')) return 'admin';
-  if (normalizedRole.includes('pilot')) return 'pilot';
-  if (normalizedRole.includes('customer')) return 'customer';
-  
-  return 'customer';
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {

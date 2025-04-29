@@ -4,7 +4,7 @@ import { Check } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-const Checkbox = React.forwardRef<HTMLButtonElement, React.ComponentProps<"button"> & { required?: boolean }>(({ className, required, ...props }, ref) => (
+const Checkbox = React.forwardRef<HTMLButtonElement, React.ComponentProps<"button"> & { required?: boolean }>(({ className, ...props }, ref) => (
   <CheckboxPrimitive.Root
     ref={ref}
     className={cn(

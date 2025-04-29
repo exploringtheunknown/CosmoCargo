@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, AlertCircle, ChevronLeft, ChevronRight, Loader } from "lucide-react";
+import { CheckCircle, AlertCircle, Loader } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { ShipmentStatus } from "@/model/types";
 import { getShipments, ShipmentsFilter, updateShipmentStatus } from "@/services/shipment-service";

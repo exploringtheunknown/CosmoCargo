@@ -11,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,7 +33,6 @@ import {
   CheckCircle,
   XCircle,
   Plane,
-  Loader2,
   Loader,
 } from "lucide-react";
 import Shipment from "@/model/shipment";
@@ -63,7 +61,7 @@ const ShipmentManagement = () => {
     },
   });
 
-  const { data: pilots, isLoading: pilotsLoading } = useQuery({
+  const { data: pilots } = useQuery({
     queryKey: ["pilots", page],
     queryFn: () => {
       const filter: PilotsFilter = {

@@ -8,7 +8,7 @@ namespace CosmoCargo.Endpoints
 {
     public static class PilotEndpoints
     {
-        public static async Task<IResult> GetAllPilots(
+        public static async Task<IResult> GetPilots(
             [AsParameters] PilotsFilter filter,
             IPilotService pilotService,
             ClaimsPrincipal user)

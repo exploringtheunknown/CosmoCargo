@@ -1,3 +1,6 @@
+import { api } from "./api";
+import { PaginatedResult } from "@/model/paginated-result";
+
 export interface Pilot {
   id: string;
   name: string;
@@ -7,14 +10,6 @@ export interface Pilot {
   assignedShipments: number;
   rating: number;
   available?: boolean;
-}
-
-export interface PaginatedResult<T> {
-  items: T[];
-  totalCount: number;
-  pageNumber: number;
-  pageSize: number;
-  totalPages: number;
 }
 
 export interface PilotsFilter {
@@ -36,11 +31,8 @@ interface UpdatePilotDto {
   experience: string;
 }
 
-// Importera api-hjälparen för att använda samma basURL och felhantering
-import { api } from "./api";
-
 export const pilotService = {
-  async getAllPilots(filter: PilotsFilter = {}): Promise<PaginatedResult<Pilot>> {
+  async getPilots(filter: PilotsFilter = {}): Promise<PaginatedResult<Pilot>> {
     const queryParams = new URLSearchParams();
     
     if (filter.pageNumber) queryParams.append('pageNumber', filter.pageNumber.toString());

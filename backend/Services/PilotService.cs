@@ -49,10 +49,10 @@ namespace CosmoCargo.Services
                 .ToListAsync();
 
             return new PaginatedResult<User>(
-                items: pilots,
-                totalCount: totalCount,
-                page: filter.PageNumber,
-                pageSize: filter.PageSize
+                pilots,
+                totalCount,
+                filter.PageNumber,
+                filter.PageSize
             );
         }
 

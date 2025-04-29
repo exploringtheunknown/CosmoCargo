@@ -132,7 +132,7 @@ app.Get("/api/shipments/{id}", ShipmentEndpoints.GetShipmentById);
 app.Post("/api/shipments", ShipmentEndpoints.CreateShipment, ["Customer"]);
 app.Put("/api/shipments/{id}/status", ShipmentEndpoints.UpdateShipmentStatus, ["Pilot", "Admin"]);
 app.Put("/api/shipments/{id}/assign", ShipmentEndpoints.AssignPilot, ["Admin"]);
-app.Get("/api/pilots", PilotEndpoints.GetAllPilots, ["Admin"]);
+app.Get("/api/pilots", PilotEndpoints.GetPilots, ["Admin"]);
 app.Get("/api/pilots/{id}", PilotEndpoints.GetPilotById, ["Admin"]);
 app.Get("/api/pilots/{id}/availability", PilotEndpoints.GetPilotAvailability, ["Admin"]);
 app.Put("/api/pilots/{id}/status", PilotEndpoints.UpdatePilotStatus, ["Admin"]);

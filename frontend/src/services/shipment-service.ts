@@ -1,7 +1,8 @@
 import { api } from "./api";
-import Shipment, { ShipmentContact, PaginatedResult } from "../model/shipment";
+import Shipment, { ShipmentContact } from "../model/shipment";
 import { ShipmentStatus } from "../model/types";
 import { mapBackendStatusToFrontend, mapFrontendStatusToBackend } from "../utils/shipment-status";
+import { PaginatedResult } from "@/model/paginated-result";
 
 export interface CreateShipmentRequest {
     origin: ShipmentContact;

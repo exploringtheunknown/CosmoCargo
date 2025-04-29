@@ -10,7 +10,8 @@ export interface PaginationProps {
 }
 
 const Pagination = ({ totalCount, page, pageSize, totalPages, onPageChange}: PaginationProps) => {
-  const itemsOnPage = Math.min(pageSize, totalCount - (page - 1) * pageSize);
+  const itemsOnPage = Math.min(pageSize, totalCount - page * pageSize);
+  console.log(totalCount, page, pageSize, totalPages, itemsOnPage);
   return <div className="flex items-center justify-between mt-6">
   <div className="text-sm text-space-text-secondary">
     Visar {itemsOnPage} av {totalCount} leveranser

@@ -54,6 +54,7 @@ const PilotsManagement = () => {
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);
   const [selectedPilot, setSelectedPilot] = useState<Pilot | null>(null);
   
+  
   const [filter, setFilter] = useState<PilotsFilter>({
     pageNumber: 1,
     pageSize: 10,
@@ -63,7 +64,7 @@ const PilotsManagement = () => {
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['pilots', filter],
-    queryFn: () => pilotService.getAllPilots(filter),
+    queryFn: () => pilotService.getPilots(filter),
   });
 
   const handleAction = async (
@@ -238,20 +239,19 @@ const PilotsManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Pilot ID</TableHead>
+              <TableHead>#</TableHead>
               <TableHead>Namn</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Erfarenhet</TableHead>
               <TableHead>Tilldelade Frakter</TableHead>
-              <TableHead>Betyg</TableHead>
               <TableHead>Åtgärder</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.items.map((pilot) => (
+            {data?.items.map((pilot, index) => (
               <TableRow key={pilot.id}>
-                <TableCell className="font-medium">{pilot.id}</TableCell>
+                <TableCell className="font-medium">{index + 1}</TableCell>
                 <TableCell className="flex items-center gap-2">
                   <Rocket className="h-4 w-4 text-space-accent-purple" />
                   {pilot.name}
@@ -268,12 +268,6 @@ const PilotsManagement = () => {
                 </TableCell>
                 <TableCell>{pilot.experience}</TableCell>
                 <TableCell>{pilot.assignedShipments}</TableCell>
-                <TableCell>
-                  <div className="flex items-center">
-                    <span className="font-medium">{pilot.rating}</span>
-                    <span className="ml-1 text-yellow-400">★</span>
-                  </div>
-                </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     {pilot.status === "Inactive" ? (
@@ -316,7 +310,7 @@ const PilotsManagement = () => {
       {data && data.totalPages > 0 && (
         <Pagination
           totalCount={data.totalCount}
-          page={data.pageNumber}
+          page={data.page}
           pageSize={data.pageSize}
           totalPages={data.totalPages}
           onPageChange={handlePageChange}

@@ -21,7 +21,6 @@ const AddPilotPage = () => {
     experience: "",
   });
 
-  // Redirect if not admin
   React.useEffect(() => {
     if (user && user.role !== "admin") {
       router.push("/dashboard");

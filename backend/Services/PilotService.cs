@@ -1,5 +1,6 @@
 using CosmoCargo.Data;
 using CosmoCargo.Model;
+using CosmoCargo.Model.Exceptions;
 using CosmoCargo.Model.Queries;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,9 +28,9 @@ namespace CosmoCargo.Services
                     p.Email.Contains(filter.Search));
             }
 
-            if (filter.Status.HasValue)
+            if (filter.IsActive.HasValue)
             {
-                query = query.Where(p => p.Status == filter.Status.Value);
+                query = query.Where(p => p.IsActive == filter.IsActive.Value);
             }
 
             return query;
@@ -79,28 +80,27 @@ namespace CosmoCargo.Services
                                  s.Status == ShipmentStatus.InTransit));
         }
 
-        public async Task<User?> UpdatePilotStatusAsync(Guid id, UserStatus status)
+        public async Task UpdatePilotStatusAsync(Guid id, bool isActive)
         {
             var pilot = await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == id && u.Role == UserRole.Pilot);
                 
             if (pilot == null)
-                return null;
+                throw new NotFoundException("Pilot", id.ToString());
                 
-            pilot.Status = status;
+            pilot.IsActive = isActive;
             pilot.UpdatedAt = DateTime.UtcNow;
             
             await _context.SaveChangesAsync();
-            return pilot;
         }
 
-        public async Task<User?> UpdatePilotAsync(Guid id, string name, string email, string? experience)
+        public async Task UpdatePilotAsync(Guid id, string name, string email, string? experience)
         {
             var pilot = await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == id && u.Role == UserRole.Pilot);
                 
             if (pilot == null)
-                return null;
+                throw new NotFoundException("Pilot", id.ToString());
                 
             pilot.Name = name;
             pilot.Email = email;
@@ -108,10 +108,9 @@ namespace CosmoCargo.Services
             pilot.UpdatedAt = DateTime.UtcNow;
             
             await _context.SaveChangesAsync();
-            return pilot;
         }
 
-        public async Task<User> CreatePilotAsync(string name, string email, string? experience)
+        public async Task<Guid> CreatePilotAsync(string name, string email, string? experience)
         {
             var pilot = new User
             {
@@ -120,14 +119,14 @@ namespace CosmoCargo.Services
                 Email = email,
                 Experience = experience,
                 Role = UserRole.Pilot,
-                Status = UserStatus.Active,
+                IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
             
             _context.Users.Add(pilot);
             await _context.SaveChangesAsync();
-            return pilot;
+            return pilot.Id;
         }
     }
-} 
+}

@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CosmoCargo.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250428083446_Initial")]
+    [Migration("20250429132240_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -172,6 +172,10 @@ namespace CosmoCargo.Migrations
                     b.Property<int>("Role")
                         .HasColumnType("integer")
                         .HasColumnName("role");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
 
                     b.HasKey("Id")
                         .HasName("p_k_users");

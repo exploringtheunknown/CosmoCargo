@@ -29,6 +29,8 @@ namespace CosmoCargo.Data
                 entity.Property(e => e.Experience);
                 entity.Property(e => e.IsActive);
                 entity.HasIndex(e => e.Email).IsUnique();
+                entity.Property(e => e.CreatedAt).IsRequired();
+                entity.Property(e => e.UpdatedAt).IsRequired();
 
                 entity.HasMany(u => u.CustomerShipments)
                     .WithOne(s => s.Customer)
@@ -47,7 +49,6 @@ namespace CosmoCargo.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id).ValueGeneratedOnAdd();
                 
-                // Configure owned entity types
                 entity.ComplexProperty(e => e.Sender, sender =>
                 {
                     sender.Property(s => s.Name).IsRequired().HasColumnName("sender_name");

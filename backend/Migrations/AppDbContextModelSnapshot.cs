@@ -170,10 +170,6 @@ namespace CosmoCargo.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("role");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");

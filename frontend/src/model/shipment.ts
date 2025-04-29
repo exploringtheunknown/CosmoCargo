@@ -1,4 +1,5 @@
 import { ShipmentStatus } from './types';
+import User from './user';
 
 export interface ShipmentContact {
     name: string;
@@ -21,4 +22,5 @@ export default interface Shipment {
     status: ShipmentStatus;
     createdAt: string;
     updatedAt: string;
+    pilot?: User | null;
 }

@@ -34,51 +34,76 @@ import {
   CheckCircle,
   XCircle,
   Plane,
+  Loader2,
+  Loader,
 } from "lucide-react";
-import { MOCK_SHIPMENTS, MOCK_PILOTS, SHIPMENT_STATUS_MAP, MockShipment } from '../../../src/data/mock-data';
+import Shipment from "@/model/shipment";
+import { assignPilot, getShipments, ShipmentsFilter, updateShipmentStatus } from "@/services/shipment-service";
+import { ShipmentStatus } from "@/model/types";
+import { useQuery } from "@tanstack/react-query";
+import { getStatusColorClass, getStatusDisplayText } from "@/utils/shipment-status";
+import { getPilots, PilotsFilter } from "@/services/pilot-service";
+import Pagination from "@/components/ui/pagination";
 
 const ShipmentManagement = () => {
   const { user } = useAuth();
-  const [showApproveDialog, setShowApproveDialog] = useState(false);
-  const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
-  const [selectedShipment, setSelectedShipment] = useState<MockShipment | null>(null);
+  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [selectedPilot, setSelectedPilot] = useState<string>("");
+  const [page, setPage] = useState(1);
+  
+  const { data: shipments, refetch, isLoading: shipmentsLoading } = useQuery({
+    queryKey: ["shipments", page],
+    queryFn: () => {
+      const filter: ShipmentsFilter = {
+        page,
+        pageSize: 10
+      };
+      return getShipments(filter);
+    },
+  });
 
-  const handleAction = (
-    shipment: MockShipment,
-    action: "approve" | "reject" | "assign"
+  const { data: pilots, isLoading: pilotsLoading } = useQuery({
+    queryKey: ["pilots", page],
+    queryFn: () => {
+      const filter: PilotsFilter = {
+        page,
+        pageSize: 10
+      };
+      return getPilots(filter);
+    },
+  });
+
+
+  const handleAction = async (
+    shipment: Shipment,
+    action: "approve" | "denied" | "assign"
   ) => {
     setSelectedShipment(shipment);
     if (action === "approve") {
-      setShowApproveDialog(true);
-    } else if (action === "reject") {
-      setShowRejectDialog(true);
+      await updateShipmentStatus(shipment.id, {status: ShipmentStatus.Approved});
+    } else if (action === "denied") {
+      await updateShipmentStatus(shipment.id, {status: ShipmentStatus.Denied});
     } else {
       setShowAssignDialog(true);
       setSelectedPilot("");
     }
   };
 
-  const confirmAction = (action: "approve" | "reject" | "assign") => {
+  const confirmAction = async (action: "assign") => {
     if (!selectedShipment) return;
 
-    if (action === "approve") {
-      toast.success(`Frakt ${selectedShipment.id} har godkänts`);
-      setShowApproveDialog(false);
-    } else if (action === "reject") {
-      toast.success(`Frakt ${selectedShipment.id} har nekats`);
-      setShowRejectDialog(false);
-    } else if (action === "assign") {
+    if (action === "assign") {
       if (!selectedPilot) {
         toast.error("Välj en pilot först");
         return;
       }
-      const pilot = MOCK_PILOTS.find((p) => p.id === selectedPilot);
+      await assignPilot(selectedShipment.id, {pilotId: selectedPilot});
       toast.success(
-        `Frakt ${selectedShipment.id} har tilldelats till ${pilot?.name}`
+        `Frakt ${selectedShipment.id} har tilldelats`
       );
       setShowAssignDialog(false);
+      refetch();
     }
   };
 
@@ -108,46 +133,44 @@ const ShipmentManagement = () => {
         </div>
       </div>
 
+      {shipmentsLoading && (
+        <div className="flex flex-col items-center justify-center h-64 p-8">
+          <Loader className="w-12 h-12 text-space-text-secondary mb-4 animate-spin" />
+        </div>
+      )}
+      
       <div className="rounded-md border border-space-secondary bg-space-primary">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Frakt ID</TableHead>
+            <TableHead>#</TableHead>
               <TableHead>Kund</TableHead>
               <TableHead>Ursprung</TableHead>
               <TableHead>Destination</TableHead>
-              <TableHead>Schemalagd Datum</TableHead>
               <TableHead>Last</TableHead>
-              <TableHead>Vikt</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Pilot</TableHead>
               <TableHead>Åtgärder</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {MOCK_SHIPMENTS.map((shipment) => (
+            {shipments?.items.map((shipment, ix) => (
               <TableRow key={shipment.id}>
-                <TableCell className="font-medium">{shipment.id}</TableCell>
-                <TableCell>{shipment.customer}</TableCell>
-                <TableCell>{shipment.origin}</TableCell>
-                <TableCell>{shipment.destination}</TableCell>
-                <TableCell>{shipment.scheduledDate}</TableCell>
-                <TableCell>{shipment.cargo}</TableCell>
-                <TableCell>{shipment.weight}</TableCell>
+                <TableCell>{ix + 1}</TableCell>
+                <TableCell>{shipment.sender.name}</TableCell>
+                <TableCell>{shipment.sender.station + " @ " + shipment.sender.planet}</TableCell>
+                <TableCell>{shipment.receiver.station + " @ " + shipment.receiver.planet}</TableCell>
+                <TableCell>{shipment.category}</TableCell>
                 <TableCell>
-                  <Badge
-                    className={`${
-                      SHIPMENT_STATUS_MAP[shipment.status as keyof typeof SHIPMENT_STATUS_MAP].color
-                    }`}
-                  >
-                    {SHIPMENT_STATUS_MAP[shipment.status as keyof typeof SHIPMENT_STATUS_MAP].label}
-                  </Badge>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
+                    {getStatusDisplayText(shipment.status)}
+                  </span>
                 </TableCell>
                 <TableCell>
                   {shipment.pilot ? (
                     <div className="flex items-center gap-1">
                       <Plane className="h-4 w-4 text-space-accent-purple" />
-                      {shipment.pilot}
+                      {shipment.pilot.name}
                     </div>
                   ) : (
                     <span className="text-space-text-secondary">
@@ -157,7 +180,7 @@ const ShipmentManagement = () => {
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    {shipment.status === "pending_approval" && (
+                    {shipment.status === ShipmentStatus.WaitingForApproval && (
                       <>
                         <Button
                           variant="outline"
@@ -172,14 +195,14 @@ const ShipmentManagement = () => {
                           variant="outline"
                           size="sm"
                           className="text-red-500 hover:text-red-700"
-                          onClick={() => handleAction(shipment, "reject")}
+                          onClick={() => handleAction(shipment, "denied")}
                         >
                           <XCircle className="h-4 w-4 mr-1" />
                           Neka
                         </Button>
                       </>
                     )}
-                    {shipment.status === "approved" && (
+                    {shipment.status === ShipmentStatus.Approved && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -201,58 +224,15 @@ const ShipmentManagement = () => {
         </Table>
       </div>
 
-      {/* Approve Dialog */}
-      <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Godkänn Frakt</DialogTitle>
-            <DialogDescription>
-              Du håller på att godkänna frakt {selectedShipment?.id} från{" "}
-              {selectedShipment?.origin} till {selectedShipment?.destination}.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowApproveDialog(false)}
-            >
-              Avbryt
-            </Button>
-            <Button onClick={() => confirmAction("approve")}>
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Bekräfta Godkännande
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Reject Dialog */}
-      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Neka Frakt</DialogTitle>
-            <DialogDescription>
-              Du håller på att neka frakt {selectedShipment?.id} från{" "}
-              {selectedShipment?.origin} till {selectedShipment?.destination}.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowRejectDialog(false)}
-            >
-              Avbryt
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => confirmAction("reject")}
-            >
-              <XCircle className="h-4 w-4 mr-2" />
-              Bekräfta Nekande
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {shipments && shipments.totalPages > 1 && (
+        <Pagination
+          totalCount={shipments.totalCount}
+          page={page}
+          pageSize={shipments.pageSize}
+          totalPages={shipments.totalPages}
+          onPageChange={setPage}
+        />
+      )}
 
       {/* Assign Dialog */}
       <Dialog open={showAssignDialog} onOpenChange={setShowAssignDialog}>
@@ -261,7 +241,7 @@ const ShipmentManagement = () => {
             <DialogTitle>Tilldela Pilot</DialogTitle>
             <DialogDescription>
               Välj en pilot för frakt {selectedShipment?.id} från{" "}
-              {selectedShipment?.origin} till {selectedShipment?.destination}.
+              {selectedShipment?.sender.planet} till {selectedShipment?.receiver.planet}.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -274,7 +254,7 @@ const ShipmentManagement = () => {
                   <SelectValue placeholder="Välj en pilot" />
                 </SelectTrigger>
                 <SelectContent>
-                  {MOCK_PILOTS.filter((p) => p.available).map((pilot) => (
+                  {pilots?.items.filter((p) => p.available).map((pilot) => (
                     <SelectItem key={pilot.id} value={pilot.id}>
                       {pilot.name}
                     </SelectItem>

@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
-import { pilotService, Pilot } from "@/services/pilotService";
+import { getPilotById, Pilot, updatePilot, updatePilotStatus } from "@/services/pilot-service";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Select,
@@ -17,6 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 const EditPilotPage = () => {
   const router = useRouter();
@@ -29,7 +31,7 @@ const EditPilotPage = () => {
     name: "",
     email: "",
     experience: "",
-    status: "Active",
+    isActive: true,
   });
 
   const pilotId = params.id as string;
@@ -45,13 +47,13 @@ const EditPilotPage = () => {
     const fetchPilot = async () => {
       try {
         setIsLoading(true);
-        const data = await pilotService.getPilotById(pilotId);
+        const data = await getPilotById(pilotId);
         setPilot(data);
         setFormData({
           name: data.name,
           email: data.email,
           experience: data.experience || "",
-          status: data.status,
+          isActive: data.isActive,
         });
       } catch (error) {
         console.error("Error fetching pilot:", error);
@@ -68,14 +70,10 @@ const EditPilotPage = () => {
   }, [pilotId, router]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLButtonElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleStatusChange = (value: string) => {
-    setFormData((prev) => ({ ...prev, status: value as "Active" | "Inactive" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,11 +87,11 @@ const EditPilotPage = () => {
     try {
       setIsSubmitting(true);
       
-      if (pilot && pilot.status !== formData.status) {
-        await pilotService.updatePilotStatus(pilotId, formData.status as "Active" | "Inactive");
+      if (pilot?.isActive !== formData.isActive) {
+        await updatePilotStatus(pilotId, formData.isActive);
       }
       
-      await pilotService.updatePilot(pilotId, {
+      await updatePilot(pilotId, {
         name: formData.name,
         email: formData.email,
         experience: formData.experience
@@ -176,19 +174,10 @@ const EditPilotPage = () => {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
-              <Select 
-                value={formData.status} 
-                onValueChange={handleStatusChange}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Välj status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Active">Aktiv</SelectItem>
-                  <SelectItem value="Inactive">Inaktiv</SelectItem>
-                </SelectContent>
-              </Select>
+              <Checkbox id="isActive" name="isActive" />
+              <Label htmlFor="isActive">
+                Aktiv
+              </Label>
             </div>
             
             <div className="flex justify-end gap-2 pt-4">
@@ -223,4 +212,4 @@ const EditPilotPage = () => {
   );
 };
 
-export default EditPilotPage; 
+export default EditPilotPage;

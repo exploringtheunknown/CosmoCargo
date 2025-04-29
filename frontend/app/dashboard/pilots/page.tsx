@@ -15,14 +15,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
   AlertCircle,
   Rocket,
   UserPlus,
@@ -31,11 +23,9 @@ import {
   Edit,
   Loader2,
   Search,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import { useQuery } from '@tanstack/react-query';
-import { pilotService, Pilot, PilotsFilter } from '@/services/pilotService';
+import { getPilots, Pilot, PilotsFilter, updatePilotStatus } from '@/services/pilot-service';
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -50,59 +40,27 @@ import Pagination from "@/components/ui/pagination";
 const PilotsManagement = () => {
   const { user } = useAuth();
   const router = useRouter();
-  const [showApproveDialog, setShowApproveDialog] = useState(false);
-  const [showSuspendDialog, setShowSuspendDialog] = useState(false);
-  const [selectedPilot, setSelectedPilot] = useState<Pilot | null>(null);
-  
-  
   const [filter, setFilter] = useState<PilotsFilter>({
-    pageNumber: 1,
+    page: 1,
     pageSize: 10,
     search: '',
-    status: 'all'
+    isActive: undefined
   });
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['pilots', filter],
-    queryFn: () => pilotService.getPilots(filter),
+    queryFn: () => getPilots(filter),
   });
 
   const handleAction = async (
     pilot: Pilot,
     action: "approve" | "suspend"
   ) => {
-    setSelectedPilot(pilot);
-    if (action === "approve") {
-      setShowApproveDialog(true);
-    } else {
-      setShowSuspendDialog(true);
-    }
-  };
-
-  const confirmAction = async (action: "approve" | "suspend") => {
-    if (!selectedPilot) return;
-
-    try {
-      await pilotService.updatePilotStatus(
-        selectedPilot.id, 
-        action === "approve" ? "Active" : "Inactive"
-      );
-      
-      toast.success(
-        `Pilot ${selectedPilot.name} har ${action === "approve" ? "aktiverats" : "inaktiverats"}`
-      );
-      
-      refetch();
-      
-      if (action === "approve") {
-        setShowApproveDialog(false);
-      } else {
-        setShowSuspendDialog(false);
-      }
-    } catch (err) {
-      console.error('Error during action:', err);
-      toast.error("Ett fel uppstod vid statusuppdatering");
-    }
+    await updatePilotStatus(pilot.id, action === "approve");
+    toast.success(
+      `Pilot ${pilot.name} har ${action === "approve" ? "aktiverats" : "inaktiverats"}`
+    );
+    refetch();
   };
 
   const handleAddPilot = () => {
@@ -190,14 +148,14 @@ const PilotsManagement = () => {
               <label className="text-sm font-medium mb-1 block">
                 Status
               </label>
-              <Select value={filter.status} onValueChange={handleStatusFilterChange}>
+              <Select value={filter.isActive?.toString()} onValueChange={handleStatusFilterChange}>
                 <SelectTrigger>
                   <SelectValue placeholder="Välj status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Alla statusar</SelectItem>
-                  <SelectItem value="Active">Aktiv</SelectItem>
-                  <SelectItem value="Inactive">Inaktiv</SelectItem>
+                  <SelectItem value="undefined">Alla statusar</SelectItem>
+                  <SelectItem value="true">Aktiv</SelectItem>
+                  <SelectItem value="false">Inaktiv</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -260,17 +218,17 @@ const PilotsManagement = () => {
                 <TableCell>
                   <Badge
                     className={
-                      pilot.status === "Active" ? "bg-green-500" : "bg-gray-500"
+                      pilot.isActive ? "bg-green-500" : "bg-gray-500"
                     }
                   >
-                    {pilot.status === "Active" ? "Aktiv" : "Inaktiv"}
+                    {pilot.isActive ? "Aktiv" : "Inaktiv"}
                   </Badge>
                 </TableCell>
                 <TableCell>{pilot.experience}</TableCell>
                 <TableCell>{pilot.assignedShipments}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
-                    {pilot.status === "Inactive" ? (
+                    {!pilot.isActive ? (
                       <Button
                         variant="outline"
                         size="sm"
@@ -316,55 +274,6 @@ const PilotsManagement = () => {
           onPageChange={handlePageChange}
         />
       )}
-
-      <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Aktivera Pilot</DialogTitle>
-            <DialogDescription>
-              Du håller på att aktivera pilot {selectedPilot?.name}. Detta kommer att göra piloten tillgänglig för nya uppdrag.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowApproveDialog(false)}
-            >
-              Avbryt
-            </Button>
-            <Button onClick={() => confirmAction("approve")}>
-              <UserCheck className="h-4 w-4 mr-2" />
-              Bekräfta Aktivering
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showSuspendDialog} onOpenChange={setShowSuspendDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Inaktivera Pilot</DialogTitle>
-            <DialogDescription>
-              Du håller på att inaktivera pilot {selectedPilot?.name}. Detta kommer att förhindra piloten från att ta nya uppdrag.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowSuspendDialog(false)}
-            >
-              Avbryt
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => confirmAction("suspend")}
-            >
-              <UserX className="h-4 w-4 mr-2" />
-              Bekräfta Inaktivering
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };

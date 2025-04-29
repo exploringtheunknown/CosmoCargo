@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
-import { pilotService } from "@/services/pilotService";
+import { createPilot } from "@/services/pilot-service";
 import { useAuth } from "@/contexts/AuthContext";
 
 const AddPilotPage = () => {
@@ -45,7 +45,7 @@ const AddPilotPage = () => {
     
     try {
       setIsSubmitting(true);
-      await pilotService.createPilot(formData);
+      await createPilot(formData);
       toast.success("Piloten har skapats");
       router.push("/dashboard/pilots");
     } catch (error) {

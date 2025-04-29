@@ -44,14 +44,14 @@ namespace CosmoCargo.Services
             
             var pilots = await query
                 .OrderBy(p => p.Name)
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Skip((filter.Page - 1) * filter.PageSize)
                 .Take(filter.PageSize)
                 .ToListAsync();
 
             return new PaginatedResult<User>(
                 pilots,
                 totalCount,
-                filter.PageNumber,
+                filter.Page,
                 filter.PageSize
             );
         }

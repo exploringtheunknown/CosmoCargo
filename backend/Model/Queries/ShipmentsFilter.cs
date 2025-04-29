@@ -6,6 +6,8 @@ namespace CosmoCargo.Model.Queries
     {
         public string? Search { get; set; }
         public ShipmentStatus? Status { get; set; }
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
 
         // public static ValueTask<ShipmentsFilter?> BindAsync(HttpContext context, ParameterInfo parameter)
         // {

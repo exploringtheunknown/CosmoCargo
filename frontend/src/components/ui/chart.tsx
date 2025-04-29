@@ -6,7 +6,7 @@ import {
   LegendProps,
 } from "recharts";
 
-import { cn } from "../../utils/cn";
+import { cn } from "@/lib/utils";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;

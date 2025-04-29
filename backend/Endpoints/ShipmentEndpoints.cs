@@ -7,7 +7,7 @@ namespace CosmoCargo.Endpoints
 {
     public static class ShipmentEndpoints
     {
-        public static async Task<IResult> GetAllShipments(
+        public static async Task<IResult> GetShipments(
             IShipmentService shipmentService,
             [AsParameters] ShipmentsFilter filter,
             ClaimsPrincipal user)
@@ -15,18 +15,18 @@ namespace CosmoCargo.Endpoints
             var role = user.GetRole();
             var userId = user.GetUserId();
 
-            IEnumerable<Shipment> shipments;
+            PaginatedResult<Shipment> result;
 
             if (role == UserRole.Admin.ToString())
-                shipments = await shipmentService.GetShipmentsAsync(filter);
+                result = await shipmentService.GetShipmentsAsync(filter);
             else if (role == UserRole.Pilot.ToString())
-                shipments = await shipmentService.GetShipmentsByPilotIdAsync(userId, filter);
+                result = await shipmentService.GetShipmentsByPilotIdAsync(userId, filter);
             else if (role == UserRole.Customer.ToString())
-                shipments = await shipmentService.GetShipmentsByCustomerIdAsync(userId, filter);
+                result = await shipmentService.GetShipmentsByCustomerIdAsync(userId, filter);
             else
                 return Results.Forbid();
 
-            return Results.Ok(shipments);
+            return Results.Ok(result);
         }
 
         public static async Task<IResult> GetShipmentById(
@@ -56,10 +56,6 @@ namespace CosmoCargo.Endpoints
             IShipmentService shipmentService,
             ClaimsPrincipal user)
         {
-            var role = user.GetRole();
-            if (role == UserRole.Customer.ToString())
-                return Results.Forbid();
-
             var userId = user.GetUserId();
 
             var shipment = new Shipment

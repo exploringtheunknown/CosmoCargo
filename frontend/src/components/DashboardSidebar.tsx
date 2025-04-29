@@ -12,7 +12,6 @@ import {
   LogOut,
   Package,
   PackageCheck,
-  Clock,
   User,
 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -27,13 +26,8 @@ const navItems = [
       { icon: Package, label: "Boka Frakt", href: "/dashboard/book-shipment" },
       {
         icon: PackageCheck,
-        label: "Pågående Leveranser",
+        label: "Leveranser",
         href: "/dashboard/ongoing-shipments",
-      },
-      {
-        icon: Clock,
-        label: "Tidigare Leveranser",
-        href: "/dashboard/previous-shipments",
       },
     ],
   },

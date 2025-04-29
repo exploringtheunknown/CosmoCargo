@@ -8,21 +8,27 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Package, Search, Eye } from "lucide-react";
+import { Search, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { getShipments, ShipmentsFilter } from "@/services/shipment-service";
 import { ShipmentStatus } from "@/model/types";
+import { getStatusDisplayText, getStatusColorClass } from "@/utils/shipment-status";
 
 const OngoingShipments = () => {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<ShipmentStatus | "">("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const { data: shipments, refetch } = useQuery({
-    queryKey: ["shipments", search, status],
+    queryKey: ["shipments", search, status, page, pageSize],
     queryFn: () => {
-      const filter: ShipmentsFilter = {};
+      const filter: ShipmentsFilter = {
+        page,
+        pageSize
+      };
       if (search) filter.search = search;
       if (status) filter.status = status as ShipmentStatus;
       return getShipments(filter);
@@ -31,10 +37,17 @@ const OngoingShipments = () => {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
+    setPage(1); // Reset to first page when searching
   };
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatus(e.target.value as ShipmentStatus | "");
+    setPage(1); // Reset to first page when changing status
+  };
+
+  const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPageSize(Number(e.target.value));
+    setPage(1); // Reset to first page when changing page size
   };
 
   const getProgressPercentage = (status: ShipmentStatus): number => {
@@ -53,9 +66,9 @@ const OngoingShipments = () => {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-medium mb-2">Pågående Leveranser</h1>
+        <h1 className="text-2xl font-medium mb-2">Leveranser</h1>
         <p className="text-space-text-secondary">
-          Följ dina pågående leveranser i realtid
+          Följ dina leveranser i realtid
         </p>
       </div>
 
@@ -77,9 +90,24 @@ const OngoingShipments = () => {
             onChange={handleStatusChange}
           >
             <option value="">Alla statusar</option>
+            <option value={ShipmentStatus.WaitingForApproval}>Väntar på godkännande</option>
+            <option value={ShipmentStatus.Approved}>Godkänd</option>
+            <option value={ShipmentStatus.Denied}>Nekad</option>
             <option value={ShipmentStatus.Assigned}>Tilldelad</option>
-            <option value={ShipmentStatus.InTransit}>I transit</option>
+            <option value={ShipmentStatus.InTransit}>Under transport</option>
             <option value={ShipmentStatus.Delivered}>Levererad</option>
+            <option value={ShipmentStatus.Cancelled}>Avbruten</option>
+          </select>
+
+          <select
+            className="space-input"
+            value={pageSize}
+            onChange={handlePageSizeChange}
+          >
+            <option value={5}>5 per sida</option>
+            <option value={10}>10 per sida</option>
+            <option value={20}>20 per sida</option>
+            <option value={50}>50 per sida</option>
           </select>
 
           <Button className="space-button" onClick={() => refetch()}>
@@ -88,24 +116,22 @@ const OngoingShipments = () => {
         </div>
       </div>
 
-      <div className="grid gap-6">
-        {shipments?.map((shipment) => (
+      <div className="space-y-4">
+        {shipments?.items.map((shipment) => (
           <Card key={shipment.id} className="space-card overflow-hidden">
-            <CardHeader className="pb-4">
+            <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="flex items-center text-xl">
-                    <Package className="h-5 w-5 mr-2" />
-                    {shipment.id}
+                  <CardTitle className="text-lg font-medium">
+                    Frakt #{shipment.id}
                   </CardTitle>
-                  <CardDescription>Skickad: {shipment.createdAt}</CardDescription>
+                  <CardDescription>
+                    {shipment.sender.station + ' @ ' + shipment.sender.planet} → {shipment.receiver.station + ' @ ' + shipment.receiver.planet}
+                  </CardDescription>
                 </div>
-                <div className="text-right">
-                  <div className="font-medium">{shipment.status}</div>
-                  <div className="text-sm text-space-text-secondary">
-                    Pilot: {shipment.pilotId || "Inte tilldelad"}
-                  </div>
-                </div>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
+                  {getStatusDisplayText(shipment.status)}
+                </span>
               </div>
             </CardHeader>
             <CardContent>
@@ -137,6 +163,36 @@ const OngoingShipments = () => {
           </Card>
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {shipments && shipments.totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6">
+          <div className="text-sm text-space-text-secondary">
+            Visar {shipments.items.length} av {shipments.totalCount} leveranser
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm">
+              Sida {page} av {shipments.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.min(shipments.totalPages, p + 1))}
+              disabled={page === shipments.totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

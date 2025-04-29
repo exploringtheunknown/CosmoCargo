@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {
@@ -11,28 +11,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Rocket, CheckCircle, AlertCircle } from "lucide-react";
-import { MOCK_ASSIGNED_SHIPMENTS } from '../../../src/data/mock-data';
-
-const statusMap = {
-  pending: { label: "Väntande", color: "bg-amber-500" },
-  in_transit: { label: "Under transport", color: "bg-blue-500" },
-  completed: { label: "Levererad", color: "bg-green-500" },
-  cancelled: { label: "Avbruten", color: "bg-red-500" },
-};
+import { CheckCircle, AlertCircle, ChevronLeft, ChevronRight, Loader } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ShipmentStatus } from "@/model/types";
+import { getShipments, ShipmentsFilter, updateShipmentStatus } from "@/services/shipment-service";
+import { getStatusDisplayText, getStatusColorClass } from "@/utils/shipment-status";
 
 const AssignedShipments = () => {
   const { user } = useAuth();
-
-  const handleUpdateStatus = (shipmentId: string, newStatus: string) => {
-    toast.success(
-      `Status uppdaterad för frakt ${shipmentId} till ${
-        statusMap[newStatus as keyof typeof statusMap].label
-      }`
-    );
-  };
+  const [page, setPage] = useState(1);
+  
+  const { data: shipments, refetch, isLoading } = useQuery({
+    queryKey: ["shipments", page],
+    queryFn: () => {
+      const filter: ShipmentsFilter = {
+        page,
+        pageSize: 10
+      };
+      return getShipments(filter);
+    },
+  });
 
   if (user?.role !== "pilot") {
     return (
@@ -47,6 +46,14 @@ const AssignedShipments = () => {
     );
   }
 
+  const handleUpdateStatus = async (shipmentId: string, newStatus: ShipmentStatus) => {
+    await updateShipmentStatus(shipmentId, { status: newStatus });
+    toast.success(
+      `Status uppdaterad för frakt ${shipmentId} till ${getStatusDisplayText(newStatus)}`
+    );
+    refetch();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -58,68 +65,54 @@ const AssignedShipments = () => {
             Hantera dina tilldelade frakter och uppdatera deras status
           </p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Rocket className="h-5 w-5 text-space-accent-purple" />
-          <span className="font-medium">Pilot: {user.name}</span>
-        </div>
       </div>
 
-      {MOCK_ASSIGNED_SHIPMENTS.length > 0 ? (
+      {shipments && shipments.items.length > 0 ? (
         <div className="rounded-md border border-space-secondary bg-space-primary">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Frakt ID</TableHead>
+                <TableHead>#</TableHead>
                 <TableHead>Kund</TableHead>
                 <TableHead>Ursprung</TableHead>
                 <TableHead>Destination</TableHead>
-                <TableHead>Schemalagd Datum</TableHead>
                 <TableHead>Last</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Åtgärder</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {MOCK_ASSIGNED_SHIPMENTS.map((shipment) => (
+              {shipments.items.map((shipment, ix) => (
                 <TableRow key={shipment.id}>
-                  <TableCell className="font-medium">{shipment.id}</TableCell>
-                  <TableCell>{shipment.customer}</TableCell>
-                  <TableCell>{shipment.origin}</TableCell>
-                  <TableCell>{shipment.destination}</TableCell>
-                  <TableCell>{shipment.scheduledDate}</TableCell>
-                  <TableCell>{shipment.cargo}</TableCell>
+                  <TableCell>{ix + 1}</TableCell>
+                  <TableCell>{shipment.sender.name}</TableCell>
+                  <TableCell>{shipment.sender.station + " @ " + shipment.sender.planet}</TableCell>
+                  <TableCell>{shipment.receiver.station + " @ " + shipment.receiver.planet}</TableCell>
+                  <TableCell>{shipment.category}</TableCell>
                   <TableCell>
-                    <Badge
-                      className={`${
-                        statusMap[shipment.status as keyof typeof statusMap]
-                          .color
-                      }`}
-                    >
-                      {
-                        statusMap[shipment.status as keyof typeof statusMap]
-                          .label
-                      }
-                    </Badge>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
+                      {getStatusDisplayText(shipment.status)}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
-                      {shipment.status === "pending" && (
+                      {shipment.status === "Assigned" && (
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() =>
-                            handleUpdateStatus(shipment.id, "in_transit")
+                            handleUpdateStatus(shipment.id, ShipmentStatus.InTransit)
                           }
                         >
                           Påbörja Transport
                         </Button>
                       )}
-                      {shipment.status === "in_transit" && (
+                      {shipment.status === "InTransit" && (
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() =>
-                            handleUpdateStatus(shipment.id, "completed")
+                            handleUpdateStatus(shipment.id, ShipmentStatus.Delivered)
                           }
                         >
                           Markera Levererad
@@ -132,6 +125,10 @@ const AssignedShipments = () => {
             </TableBody>
           </Table>
         </div>
+      ) : isLoading ? (
+        <div className="flex flex-col items-center justify-center h-64 p-8">
+          <Loader className="w-12 h-12 text-space-text-secondary mb-4 animate-spin" />
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center h-64 border border-dashed border-space-secondary rounded-md p-8">
           <CheckCircle className="w-12 h-12 text-space-text-secondary mb-4" />
@@ -140,6 +137,36 @@ const AssignedShipments = () => {
             Du har inga tilldelade frakter för tillfället. När en administratör
             tilldelar dig frakter kommer de att visas här.
           </p>
+        </div>
+      )}
+
+      {/* Pagination Controls */}
+      {shipments && shipments.totalPages > 1 && (
+        <div className="flex items-center justify-between mt-6">
+          <div className="text-sm text-space-text-secondary">
+            Visar {shipments.items.length} av {shipments.totalCount} leveranser
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm">
+              Sida {page} av {shipments.totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.min(shipments.totalPages, p + 1))}
+              disabled={page === shipments.totalPages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       )}
     </div>

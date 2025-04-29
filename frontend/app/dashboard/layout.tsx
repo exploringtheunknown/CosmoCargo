@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import DashboardHeader from "@/components/DashboardHeader";
+import Head from "next/head";
 
 export default function DashboardLayout({
   children,
@@ -17,6 +18,14 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-space-dark text-space-text-primary">
+      <Head>
+        <style jsx global>{`
+          html {
+            overflow: hidden;
+          }
+        `}</style>
+      </Head>
+      
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <DashboardSidebar />

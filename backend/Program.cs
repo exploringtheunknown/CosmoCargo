@@ -127,7 +127,7 @@ using (var scope = app.Services.CreateScope())
 
 app.GetAnonymous("/api/healthcheck/ping", HealthcheckEndpoints.Ping);
 app.PostAnonymous("/api/auth/login", AuthEndpoints.Login);
-app.Get("/api/shipments", ShipmentEndpoints.GetAllShipments);
+app.Get("/api/shipments", ShipmentEndpoints.GetShipments);
 app.Get("/api/shipments/{id}", ShipmentEndpoints.GetShipmentById);
 app.Post("/api/shipments", ShipmentEndpoints.CreateShipment, ["Customer"]);
 app.Put("/api/shipments/{id}/status", ShipmentEndpoints.UpdateShipmentStatus, ["Pilot", "Admin"]);

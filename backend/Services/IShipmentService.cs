@@ -4,9 +4,9 @@ namespace CosmoCargo.Services
 {
     public interface IShipmentService
     {
-        Task<IEnumerable<Shipment>> GetShipmentsAsync(ShipmentsFilter filter);
-        Task<IEnumerable<Shipment>> GetShipmentsByCustomerIdAsync(Guid customerId, ShipmentsFilter filter);
-        Task<IEnumerable<Shipment>> GetShipmentsByPilotIdAsync(Guid pilotId, ShipmentsFilter filter);
+        Task<PaginatedResult<Shipment>> GetShipmentsAsync(ShipmentsFilter filter);
+        Task<PaginatedResult<Shipment>> GetShipmentsByCustomerIdAsync(Guid customerId, ShipmentsFilter filter);
+        Task<PaginatedResult<Shipment>> GetShipmentsByPilotIdAsync(Guid pilotId, ShipmentsFilter filter);
         Task<Shipment?> GetShipmentByIdAsync(Guid id);
         Task<Shipment> CreateShipmentAsync(Shipment shipment);
         Task<Shipment?> UpdateShipmentStatusAsync(Guid id, ShipmentStatus status);

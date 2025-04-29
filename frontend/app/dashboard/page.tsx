@@ -144,10 +144,13 @@ const recentShipments = [
 
 const DashboardOverview: React.FC = () => {
   return (
+    <>
+    <div className="fixed z-1 top-0 left-0 w-full h-full flex items-center justify-center rotate-[-20deg] text-5xl pointer-events-none">WORK IN PROGRESS</div>
+
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-orbitron text-space-text-primary">
-          Dashboard Översikt
+          Översikt
         </h1>
         <div className="text-sm text-space-text-secondary">
           <span>
@@ -158,7 +161,7 @@ const DashboardOverview: React.FC = () => {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 opacity-40">
         <Card className="space-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-orbitron flex items-center space-x-2">
@@ -238,7 +241,7 @@ const DashboardOverview: React.FC = () => {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 opacity-40">
         <Card className="bg-space-primary border border-space-secondary border-opacity-50 rounded-xl overflow-hidden shadow-lg">
           <CardHeader>
             <CardTitle className="font-orbitron">Leveranstrend</CardTitle>
@@ -331,7 +334,7 @@ const DashboardOverview: React.FC = () => {
       </div>
 
       {/* Bottom Row */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 opacity-40">
         <Card className="bg-space-primary border border-space-secondary border-opacity-50 rounded-xl overflow-hidden shadow-lg lg:col-span-2">
           <CardHeader>
             <CardTitle className="font-orbitron">Senaste Leveranser</CardTitle>
@@ -468,6 +471,7 @@ const DashboardOverview: React.FC = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,10 +1,10 @@
-# 🚀 CosmoCargo™ – Intergalaktisk Fraktcentral
+# 🚀 CosmoCargo™ – Den Intergalaktiska Fraktcentralen
 
 ## 🪐 Bakgrund
 
 **CosmoCargo™** är den ledande aktören inom rymdlogistik, med leveranser till över 9000 rymdstationer och kolonier i hela galaxen, från de innersta månarna vid Jupiter till de yttre handelszonerna i Andromedatriangeln. Tusentals transporter koordineras dagligen genom ett sofistikerat bokningssystem som används av kunder, piloter och administratörer. Allt måste gå snabbt, säkert och smidigt i det intergalaktiska kaoset.
 
-## 🛠️ Teknisk Stack
+## 🛠️ Tech Stack
 
 ### Frontend
 - React
@@ -12,118 +12,107 @@
 - Next.js
 - Tanstack Query
 - Tailwind CSS
-- Mocha (för testning)
 
 ### Backend
 - .NET
 - Minimal API
 - REST
-- Entity Framework Core
+- Entity Framework
 - PostgreSQL
 
 ### Infrastruktur
-- Docker Compose
+- Docker
 
 ## 🚀 Utveckling
 
 ### Förutsättningar
-- Docker och Docker Compose
-- Node.js (v22+)
+- Docker Desktop 3.4+
+- Node.js 22+
 - .NET SDK 9
 
-### Installation
+### Kör lokalt
 
-1. Starta hela applikationen med Docker Compose:
+1. Starta hela systemet med Docker:
 ```bash
 docker compose up --detach --build
 ```
 
-2. Vänta på seedningen av databasen (endast första gången):
+2. Vänta på seedningen av databasen (tar ca 2min, endast första gången):
    - Se logg för `cosmocargo-backend-1` containern
 
-3. Applikationen är nu tillgänglig på:
+3. Systemet är nu tillgängligt på:
    - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
+   - Backend: http://localhost:5000
 
+### Tips
 
-### Köra tester
-```bash
-# Frontend tester
-cd frontend
-npm test
-
-# Backend tester
-cd backend
-dotnet test
-```
-
-## 📁 Projektstruktur
-
-```
-cosmocargo/
-├── frontend/           # Next.js React-applikation
-├── backend/            # .NET Minimal API
-├── docker-compose.yml  # Docker Compose-konfiguration
-└── README.md           # Projektdokumentation
-```
+Om du vill jobba med frontend:
+1. Starta systemet enligt ovan
+2. Stoppa frontend-containern `cosmocargo-frontend-1` (för att minska belastningen på din dator)
+3. Kör: `cd frontend && npm run dev`
+   - Frontend finns nu tillgängig på http://localhost:3001 (med hot reload)
+  
+Om du vill jobba med backend:
+1. Starta systemet enligt ovan
+2. Stoppa backend-containern `cosmocargo-backend-1` (för att förhindra konflikter i redan använda portar)
+3. Kör: `cd backend && dotnet watch`
+   - Backend finns nu tillgängig på http://localhost:5000 (med hot reload)
 
 ## 📄 Befintlig funktionalitet
 
-#### 🔐 Inloggning & Roller
-- Inloggning/registrering för tre roller: **Kund**, **Pilot**, **Admin**
+Användare i systemet kan ha en av följande roller: **Kund**, **Pilot** eller **Admin**.
 
-#### 👩‍🚀 Kundvy
-- En kund kan skapa en frakt via formulär (avsändare, mottagare, vikt, kategori, prioritet)
-- En kund kan se pågående och tidigare leveranser
-- En kund kan spåra paket i realtid (simulerad status)
+#### 👩‍🚀 Kund
+- En kund kan skapa en frakt via formulär
+- En kund kan se sina frakter
 
-#### 🚀 Pilotvy
-- En pilot kan se tilldelade frakter (status, datum, destination)
-- En pilot kan uppdatera leveransens status till: *ongoing*, *delivered*
+#### 🚀 Pilot
+- En pilot kan se tilldelade frakter
+- En pilot kan uppdatera fraktens status till: *Under Transport* eller *Levererad*
 
-#### 🧑‍💼 Admin Dashboard
-- En admin kan se alla frakter och filtera på olika parametrar.
-- En admin kan tilldela en pilot till en frakt
-- En admin kan ändra fraktstatus till *delayed*, *lost in black hole*
+#### 🧑‍💼 Admin
+- En admin kan se alla frakter
+- En admin kan godkänna/neka frakter
+- En admin kan tilldela en frakt till en pilot
 
 ---
 
-## 📄 Uppgift 1: Galactic Cargo Declaration™ (Frontend)
+# Uppgifter
 
-Universum står inför ett handelskrig och intergalaktiska tullar kommer införas. CosmoCargo har anlitat dig för att ta fram ett system för tullhantering, med fokus på användarvänlighet, tydlig struktur och god kodkvalitet.
+Vi tänker oss att du kan lägga 4 timmar, eller mer om du känner för det, på en eller flera av uppgifterna nedan. Uppgifterna är medvetet luddiga/öppna för att tillåta kreativitet men skriv gärna om du avviker från exempel/specar i dokumentationen/readme.
 
-### Funktionalitet
-- **Kund**: Skickar in tullformulär vid bokning
+## 📄 Uppgift 1: Galactic Cargo Declaration™ (Frontend/Backend/Fullstack)
+
+Universum står inför ett handelskrig och intergalaktiska tullar kommer införas. CosmoCargo har anlitat dig för att ta fram ett system för tullhantering.
+
+### Funktionalitet / Krav
+- **Kund**: Fylla i ett valfritt tullformulär i samband med skapandet av en frakt
 - **Admin**: Granskar formuläret
-- **Pilot**: Ser om frakten är högriskklassad
+- **Pilot**: Ser om frakten är högriskklassad och om karantän behövs
 
-### Formulärfält
+### Formulär (exempel)
 
 | Fält | Typ | Beskrivning |
 |------|-----|-------------|
-| `shipmentId` | UUID | Referens till frakten |
-| `containsLifeforms` | Boolean | Innehåller levande varelser |
-| `lifeformType` | Text | (Om ja) Beskrivning av art, intelligens, riskklass |
-| `isPlasmaActive` | Boolean | Innehåller plasma-aktiva material |
-| `plasmaStabilityLevel` | Number (1–10) | Stabilitetsskala (om plasmaaktiv) |
-| `originPlanetLawsConfirmed` | Checkbox | Intygande om laglig export |
-| `quarantineRequired` | Boolean | Kräver karantänzon vid ankomst |
-| `customsNotes` | Textarea | Frivillig kommentar |
-| `submittedBy` | Auto | Användare kopplas automatiskt |
+| `containsLifeforms`  | Innehåller levande varelser |
+| `lifeformType` | (Om levande varelser) Beskrivning av art, intelligens, riskklass |
+| `isPlasmaActive`  | Innehåller plasma-aktiva material |
+| `plasmaStabilityLevel` | Stabilitetsskala (om plasmaaktiv) |
+| `originPlanetLawsConfirmed` | Intygande om laglig export |
+| `customsNotes` | Frivillig kommentar |
 
-### Valideringsregler
+### Valideringsregler (exempel)
 
 - `containsLifeforms === true` ⇒ `lifeformType` är obligatoriskt
 - `isPlasmaActive === true` ⇒ `plasmaStabilityLevel` måste anges (1–10)
 - `plasmaStabilityLevel < 4` ⇒ `quarantineRequired` måste vara true
 - `originPlanetLawsConfirmed` måste vara ikryssad
-- Textfält har begränsningar (säkerhet)
 
-### Automatiserad Riskbedömning
+### Automatiserad Riskbedömning (exempel)
 
 Bygg en funktion som klassificerar risknivå baserat på tullformulär.
 
-### Riskklassificering
+### Riskklassificering (exempel)
 
 | Villkor | Risknivå |
 |---------|----------|
@@ -138,10 +127,10 @@ Bygg en funktion som klassificerar risknivå baserat på tullformulär.
 
 I rymden kan allt gå fel. Ta rollen som Master of the Universe och bygg en Intergalactic Chaos Engine som slupmässigt genererar olika händelser som påverkar frakterna.
 
-### Funktionalitet
-- Var X:e minut muteras en slumpmässig frakt baserat på en kaoshändelse
+### Funktionalitet / Krav
+- Var X:e sekund muteras en slumpmässig frakt baserat på en kaoshändelse
 - Ta hänsyn till sannorlikheter
-- Visa dessa i ett “Galactic Event Feed” på admin-panelen med tidsstämpel och påverkan (frontend), alternativt endast i logg (backend)
+- Visa dessa i ett “Galactic Event Feed” för admins med tidsstämpel och påverkan (frontend), alternativt endast loggning (backend)
 
 ### Förslag på händelser
 
@@ -156,18 +145,17 @@ I rymden kan allt gå fel. Ta rollen som Master of the Universe och bygg en Inte
 
 ### Sannorlikhet
 
-- Vissa frakttyper (ex. plasmaaktiva med instabilitet < 5) har större sannolikhet att drabbas 
-- Algoritmen ska ta hänsyn till risknivå. 
+- Vissa frakttyper (beroende på kategori) har större sannolikhet att drabbas
 
 ## 📄 Uppgift 3: Intergalactic AI Support™ (Fullstack)
 
 CosmoCargo vill kunna erbjudea sina kunder en tillgänglig och engegerande kanal för att snabbt få hjälp med supportärenden och guida användaren genom systemet. Du är anlitad för att implementera en chatbot som ska svara på kundernas vanligaste frågor.
 
-### Funktionalitet
+### Funktionalitet / Krav
 - Svara på frågor baserat på kundens fraktdata
 - Svara på frågor om formulär eller regler
 
-### Förslag på smart konversation
+### Förslag på smart konversation (exempel)
 
 | Fråga från användare | Svar från bot |
 |---------|----------|
@@ -182,7 +170,6 @@ CosmoCargo vill kunna erbjudea sina kunder en tillgänglig och engegerande kanal
 
 - Funktionalitet & kravuppfyllnad
 - Responsiv design
-- Arkitektur & kodkvalitet
-- UX/UI
-- DevOps & struktur
-- Dokumentation & onboarding
+- Struktur & kodkvalitet
+- Dokumentation
+- Användning av lämpliga AI-verktyg

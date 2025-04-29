@@ -4,7 +4,8 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { api } from "../services/api";
-import { UserRole } from "../model/types";
+import { mapBackendRoleToFrontend } from "@/utils/shipment-status";
+
 interface User {
   email: string;
   name: string;
@@ -21,7 +22,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const mapRoleToFrontend = (backendRole: UserRole | string | number): 'customer' | 'pilot' | 'admin' => {
+const mapRoleToFrontend = (backendRole: number): 'customer' | 'pilot' | 'admin' => {
   
   if (typeof backendRole === 'number') {
     switch (backendRole) {
@@ -74,17 +75,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         throw new Error('Failed to fetch user data');
       }
       
-      const userData = userResponse.data;
-      
-      const frontendRole = mapRoleToFrontend(userData.role);
-      
-      setUser({
-        ...userData,
-        role: frontendRole
-      });
+      const user = userResponse.data;
+      user.role = mapBackendRoleToFrontend(parseInt(user.role + ""));
+      setUser(user);
       setIsAuthenticated(true);
-      localStorage.setItem("user", JSON.stringify(userData));
-      toast.success(`Välkommen, ${userData.name}!`);
+      localStorage.setItem("user", JSON.stringify(user));
+      toast.success(`Välkommen, ${user.name}!`);
       return true;
     } catch {
       toast.error("Felaktiga inloggningsuppgifter");

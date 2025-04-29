@@ -40,24 +40,51 @@ namespace CosmoCargo.Services
             return query;
         }
 
-        public async Task<IEnumerable<Shipment>> GetShipmentsAsync(ShipmentsFilter filter)
+        public async Task<PaginatedResult<Shipment>> GetShipmentsAsync(ShipmentsFilter filter)
         {
-            return await ApplyFilter(filter).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Shipment>> GetShipmentsByCustomerIdAsync(Guid customerId, ShipmentsFilter filter)
-        {
-            return await ApplyFilter(filter)
-                .Where(s => s.CustomerId == customerId)
+            var query = ApplyFilter(filter);
+            var totalCount = await query.CountAsync();
+            
+            var items = await query
+                .OrderByDescending(s => s.CreatedAt)
+                .Skip((filter.Page - 1) * filter.PageSize)
+                .Take(filter.PageSize)
                 .ToListAsync();
+
+            return new PaginatedResult<Shipment>(items, totalCount, filter.Page, filter.PageSize);
         }
 
-        public async Task<IEnumerable<Shipment>> GetShipmentsByPilotIdAsync(Guid pilotId, ShipmentsFilter filter)
+        public async Task<PaginatedResult<Shipment>> GetShipmentsByCustomerIdAsync(Guid customerId, ShipmentsFilter filter)
         {
-            return await ApplyFilter(filter)
+            var query = ApplyFilter(filter)
+                .Where(s => s.CustomerId == customerId);
+            
+            var totalCount = await query.CountAsync();
+            
+            var items = await query
+                .OrderByDescending(s => s.CreatedAt)
+                .Skip((filter.Page - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync();
+
+            return new PaginatedResult<Shipment>(items, totalCount, filter.Page, filter.PageSize);
+        }
+
+        public async Task<PaginatedResult<Shipment>> GetShipmentsByPilotIdAsync(Guid pilotId, ShipmentsFilter filter)
+        {
+            var query = ApplyFilter(filter)
                 .Include(s => s.Customer)
-                .Where(s => s.PilotId == pilotId)
+                .Where(s => s.PilotId == pilotId);
+            
+            var totalCount = await query.CountAsync();
+            
+            var items = await query
+                .OrderByDescending(s => s.CreatedAt)
+                .Skip((filter.Page - 1) * filter.PageSize)
+                .Take(filter.PageSize)
                 .ToListAsync();
+
+            return new PaginatedResult<Shipment>(items, totalCount, filter.Page, filter.PageSize);
         }
 
         public async Task<Shipment?> GetShipmentByIdAsync(Guid id)

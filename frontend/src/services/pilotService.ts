@@ -32,6 +32,12 @@ interface CreatePilotDto {
   experience: string;
 }
 
+interface UpdatePilotDto {
+  name: string;
+  email: string;
+  experience: string;
+}
+
 // Importera api-hjälparen för att använda samma basURL och felhantering
 import { api } from "./api";
 
@@ -75,23 +81,31 @@ export const pilotService = {
     return response.data;
   },
 
-  async updatePilotStatus(id: string, status: 'Active' | 'Inactive'): Promise<Pilot> {
-    const response = await api.put<Pilot>(`/pilots/${id}/status`, { status });
+  async updatePilotStatus(id: string, status: 'Active' | 'Inactive'): Promise<void> {
+    const response = await api.put(`/pilots/${id}/status`, { status });
     
     if (!response.ok) {
       throw new Error('Kunde inte uppdatera pilotstatus');
     }
-    
-    return response.data;
   },
 
   async createPilot(pilotData: CreatePilotDto) {
-    const response = await api.post('/pilots', pilotData);
-
-    if (!response.ok) {
-      throw new Error('Kunde inte skapa pilot');
+    try {
+      const response = await api.post('/pilots', pilotData);
+      if (!response.ok) {
+        throw new Error('Kunde inte skapa pilot');
+      }
+      return response.data;
+    } catch (error) {
+      throw new Error(`Fel vid skapande av pilot: ${error instanceof Error ? error.message : 'Okänt fel'}`);
     }
+  },
 
-    return response.data;
+  async updatePilot(id: string, pilotData: UpdatePilotDto): Promise<void> {
+    const response = await api.put(`/pilots/${id}`, pilotData);
+    
+    if (!response.ok) {
+      throw new Error('Kunde inte uppdatera pilot');
+    }
   }
 }; 

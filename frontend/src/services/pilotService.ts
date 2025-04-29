@@ -2,11 +2,28 @@ export interface Pilot {
   id: string;
   name: string;
   email: string;
-  status: 'active' | 'inactive';
+  status: 'Active' | 'Inactive';
   experience: string;
   assignedShipments: number;
   rating: number;
   available?: boolean;
+}
+
+export interface PaginatedResult<T> {
+  items: T[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export interface PilotsFilter {
+  pageNumber?: number;
+  pageSize?: number;
+  search?: string;
+  status?: string;
 }
 
 interface CreatePilotDto {
@@ -19,9 +36,16 @@ interface CreatePilotDto {
 import { api } from "./api";
 
 export const pilotService = {
-  async getAllPilots(): Promise<Pilot[]> {
-    // Använd api-hjälparen istället för fetch direkt
-    const response = await api.get<Pilot[]>('/pilots');
+  async getAllPilots(filter: PilotsFilter = {}): Promise<PaginatedResult<Pilot>> {
+    const queryParams = new URLSearchParams();
+    
+    if (filter.pageNumber) queryParams.append('pageNumber', filter.pageNumber.toString());
+    if (filter.pageSize) queryParams.append('pageSize', filter.pageSize.toString());
+    if (filter.search) queryParams.append('search', filter.search);
+    if (filter.status && filter.status !== 'all') queryParams.append('status', filter.status);
+    
+    const url = `/pilots${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await api.get<PaginatedResult<Pilot>>(url);
     
     if (!response.ok) {
       console.error('Fel vid hämtning av piloter:', response.status);
@@ -46,6 +70,16 @@ export const pilotService = {
     
     if (!response.ok) {
       throw new Error('Kunde inte hämta pilottillgänglighet');
+    }
+    
+    return response.data;
+  },
+
+  async updatePilotStatus(id: string, status: 'Active' | 'Inactive'): Promise<Pilot> {
+    const response = await api.put<Pilot>(`/pilots/${id}/status`, { status });
+    
+    if (!response.ok) {
+      throw new Error('Kunde inte uppdatera pilotstatus');
     }
     
     return response.data;

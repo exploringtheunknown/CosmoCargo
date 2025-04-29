@@ -93,5 +93,41 @@ namespace CosmoCargo.Services
             await _context.SaveChangesAsync();
             return pilot;
         }
+
+        public async Task<User?> UpdatePilotAsync(Guid id, string name, string email, string? experience)
+        {
+            var pilot = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == id && u.Role == UserRole.Pilot);
+                
+            if (pilot == null)
+                return null;
+                
+            pilot.Name = name;
+            pilot.Email = email;
+            pilot.Experience = experience;
+            pilot.UpdatedAt = DateTime.UtcNow;
+            
+            await _context.SaveChangesAsync();
+            return pilot;
+        }
+
+        public async Task<User> CreatePilotAsync(string name, string email, string? experience)
+        {
+            var pilot = new User
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Email = email,
+                Experience = experience,
+                Role = UserRole.Pilot,
+                Status = UserStatus.Active,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            
+            _context.Users.Add(pilot);
+            await _context.SaveChangesAsync();
+            return pilot;
+        }
     }
 } 

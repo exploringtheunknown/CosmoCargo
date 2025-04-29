@@ -78,11 +78,55 @@ namespace CosmoCargo.Endpoints
 
             return Results.Ok(updatedPilot);
         }
+
+        public static async Task<IResult> UpdatePilot(
+            Guid id,
+            UpdatePilotRequest request,
+            IPilotService pilotService,
+            ClaimsPrincipal user)
+        {
+            var role = user.GetRole();
+            if (role != UserRole.Admin.ToString())
+                return Results.Forbid();
+
+            var updatedPilot = await pilotService.UpdatePilotAsync(id, request.Name, request.Email, request.Experience);
+            if (updatedPilot == null)
+                return Results.NotFound();
+
+            return Results.Ok(updatedPilot);
+        }
+
+        public static async Task<IResult> CreatePilot(
+            CreatePilotRequest request,
+            IPilotService pilotService,
+            ClaimsPrincipal user)
+        {
+            var role = user.GetRole();
+            if (role != UserRole.Admin.ToString())
+                return Results.Forbid();
+
+            var newPilot = await pilotService.CreatePilotAsync(request.Name, request.Email, request.Experience);
+            return Results.Created($"/api/pilots/{newPilot.Id}", newPilot);
+        }
     }
 
     public class UpdatePilotStatusRequest
     {
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public UserStatus Status { get; set; }
+    }
+
+    public class UpdatePilotRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? Experience { get; set; }
+    }
+
+    public class CreatePilotRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? Experience { get; set; }
     }
 } 

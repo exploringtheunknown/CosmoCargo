@@ -136,6 +136,8 @@ app.Get("/api/pilots", PilotEndpoints.GetAllPilots, ["Admin"]);
 app.Get("/api/pilots/{id}", PilotEndpoints.GetPilotById, ["Admin"]);
 app.Get("/api/pilots/{id}/availability", PilotEndpoints.GetPilotAvailability, ["Admin"]);
 app.Put("/api/pilots/{id}/status", PilotEndpoints.UpdatePilotStatus, ["Admin"]);
+app.Put("/api/pilots/{id}", PilotEndpoints.UpdatePilot, ["Admin"]);
+app.Post("/api/pilots", PilotEndpoints.CreatePilot, ["Admin"]);
 app.Get("/api/users/me", UserEndpoints.GetMe);
 app.Put("/api/users/me", UserEndpoints.UpdateMe);
 

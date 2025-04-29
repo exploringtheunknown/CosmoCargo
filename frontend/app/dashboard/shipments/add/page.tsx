@@ -59,7 +59,7 @@ const BookShipment = () => {
         variant: "default",
       });
 
-      router.push("/dashboard/ongoing-shipments");
+      router.push("/dashboard/shipments/ongoing");
     } catch {
       toast({
         title: "Ett fel uppstod",

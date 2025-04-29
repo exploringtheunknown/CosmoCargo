@@ -15,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getShipments, ShipmentsFilter } from "@/services/shipment-service";
 import { ShipmentStatus } from "@/model/types";
 import { getStatusDisplayText, getStatusColorClass } from "@/utils/shipment-status";
+import Pagination from "@/components/ui/pagination";
 
 const OngoingShipments = () => {
   const [search, setSearch] = useState("");
@@ -164,34 +165,14 @@ const OngoingShipments = () => {
         ))}
       </div>
 
-      {/* Pagination Controls */}
       {shipments && shipments.totalPages > 1 && (
-        <div className="flex items-center justify-between mt-6">
-          <div className="text-sm text-space-text-secondary">
-            Visar {shipments.items.length} av {shipments.totalCount} leveranser
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm">
-              Sida {page} av {shipments.totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(p => Math.min(shipments.totalPages, p + 1))}
-              disabled={page === shipments.totalPages}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <Pagination
+          totalCount={shipments.totalCount}
+          page={page}
+          pageSize={shipments.pageSize}
+          totalPages={shipments.totalPages}
+          onPageChange={setPage}
+        />
       )}
     </div>
   );

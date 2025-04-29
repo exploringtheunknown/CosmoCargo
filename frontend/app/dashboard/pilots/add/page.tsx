@@ -47,7 +47,7 @@ const AddPilotPage = () => {
       setIsSubmitting(true);
       await pilotService.createPilot(formData);
       toast.success("Piloten har skapats");
-      router.push("/dashboard/pilots-management");
+      router.push("/dashboard/pilots");
     } catch (error) {
       console.error("Error creating pilot:", error);
       toast.error("Ett fel uppstod när piloten skulle skapas");
@@ -62,7 +62,7 @@ const AddPilotPage = () => {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => router.push("/dashboard/pilots-management")}
+          onClick={() => router.push("/dashboard/pilots")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Tillbaka
@@ -118,7 +118,7 @@ const AddPilotPage = () => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.push("/dashboard/pilots-management")}
+                onClick={() => router.push("/dashboard/pilots")}
               >
                 Avbryt
               </Button>

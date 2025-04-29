@@ -45,6 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Pagination from "@/components/ui/pagination";
 
 const PilotsManagement = () => {
   const { user } = useAuth();
@@ -63,7 +64,6 @@ const PilotsManagement = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['pilots', filter],
     queryFn: () => pilotService.getAllPilots(filter),
-    enabled: user?.role === 'admin'
   });
 
   const handleAction = async (
@@ -109,7 +109,7 @@ const PilotsManagement = () => {
   };
 
   const handleEditPilot = (id: string) => {
-    router.push(`/dashboard/pilots/edit/${id}`);
+    router.push(`/dashboard/pilots/${id}`);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -313,45 +313,14 @@ const PilotsManagement = () => {
         </Table>
       </div>
 
-      {data && data.totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-space-text-secondary">
-            Visar {(data.pageNumber - 1) * data.pageSize + 1} till {Math.min(data.pageNumber * data.pageSize, data.totalCount)} av {data.totalCount} piloter
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageChange(data.pageNumber - 1)}
-              disabled={!data.hasPreviousPage}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Föregående
-            </Button>
-            <div className="flex items-center gap-1">
-              {Array.from({ length: data.totalPages }, (_, i) => i + 1).map((page) => (
-                <Button
-                  key={page}
-                  variant={page === data.pageNumber ? "default" : "outline"}
-                  size="sm"
-                  className="w-8 h-8 p-0"
-                  onClick={() => handlePageChange(page)}
-                >
-                  {page}
-                </Button>
-              ))}
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handlePageChange(data.pageNumber + 1)}
-              disabled={!data.hasNextPage}
-            >
-              Nästa
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+      {data && data.totalPages > 0 && (
+        <Pagination
+          totalCount={data.totalCount}
+          page={data.pageNumber}
+          pageSize={data.pageSize}
+          totalPages={data.totalPages}
+          onPageChange={handlePageChange}
+        />
       )}
 
       <Dialog open={showApproveDialog} onOpenChange={setShowApproveDialog}>

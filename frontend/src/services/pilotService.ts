@@ -15,8 +15,6 @@ export interface PaginatedResult<T> {
   pageNumber: number;
   pageSize: number;
   totalPages: number;
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
 }
 
 export interface PilotsFilter {

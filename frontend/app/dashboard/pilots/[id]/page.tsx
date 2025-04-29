@@ -56,7 +56,7 @@ const EditPilotPage = () => {
       } catch (error) {
         console.error("Error fetching pilot:", error);
         toast.error("Kunde inte hämta pilotinformation");
-        router.push("/dashboard/pilots-management");
+        router.push("/dashboard/pilots");
       } finally {
         setIsLoading(false);
       }
@@ -100,7 +100,7 @@ const EditPilotPage = () => {
       });
       
       toast.success("Pilotinformationen har uppdaterats");
-      router.push("/dashboard/pilots-management");
+      router.push("/dashboard/pilots");
     } catch (error) {
       console.error("Error updating pilot:", error);
       toast.error("Ett fel uppstod när piloten skulle uppdateras");
@@ -123,7 +123,7 @@ const EditPilotPage = () => {
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => router.push("/dashboard/pilots-management")}
+          onClick={() => router.push("/dashboard/pilots")}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Tillbaka
@@ -195,7 +195,7 @@ const EditPilotPage = () => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.push("/dashboard/pilots-management")}
+                onClick={() => router.push("/dashboard/pilots")}
               >
                 Avbryt
               </Button>

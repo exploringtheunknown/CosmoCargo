@@ -158,7 +158,7 @@ namespace CosmoCargo.Data
                 await connection.OpenAsync();
 
             using var writer = await connection.BeginBinaryImportAsync(
-                "COPY users (id, name, email, password_hash, role, experience, is_active, created_at) FROM STDIN (FORMAT BINARY)");
+                "COPY users (id, name, email, password_hash, role, experience, is_active, created_at, updated_at) FROM STDIN (FORMAT BINARY)");
 
             foreach (var user in users)
             {
@@ -171,6 +171,7 @@ namespace CosmoCargo.Data
                 await writer.WriteAsync(user.Experience);
                 await writer.WriteAsync(user.IsActive);
                 await writer.WriteAsync(user.CreatedAt);
+                await writer.WriteAsync(user.UpdatedAt);
             }
 
             await writer.CompleteAsync();

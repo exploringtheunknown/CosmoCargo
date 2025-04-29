@@ -23,11 +23,11 @@ const navItems = [
     title: "Kundmeny",
     items: [
       { icon: Home, label: "Översikt", href: "/dashboard" },
-      { icon: Package, label: "Boka Frakt", href: "/dashboard/book-shipment" },
+      { icon: Package, label: "Boka Frakt", href: "/dashboard/shipments/book" },
       {
         icon: PackageCheck,
         label: "Leveranser",
-        href: "/dashboard/ongoing-shipments",
+        href: "/dashboard/shipments/ongoing",
       },
     ],
   },
@@ -39,7 +39,7 @@ const navItems = [
       {
         icon: Rocket,
         label: "Tilldelade Frakter",
-        href: "/dashboard/assigned-shipments",
+        href: "/dashboard/shipments/assigned",
       },
     ],
   },
@@ -50,13 +50,13 @@ const navItems = [
       { icon: Home, label: "Översikt", href: "/dashboard" },
       {
         icon: ClipboardList,
-        label: "Fraktöversikt",
-        href: "/dashboard/shipment-management",
+        label: "Frakter",
+        href: "/dashboard/shipments",
       },
       {
         icon: User,
-        label: "Hantera Piloter",
-        href: "/dashboard/pilots-management",
+        label: "Piloter",
+        href: "/dashboard/pilots",
       },
     ],
   },

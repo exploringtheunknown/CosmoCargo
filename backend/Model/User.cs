@@ -11,8 +11,14 @@ namespace CosmoCargo.Model
         [JsonIgnore]
         public string PasswordHash { get; set; } = string.Empty;
         
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public UserRole Role { get; set; }
-        public DateTime CreatedAt { get; set; }
+        
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public UserStatus Status { get; set; } = UserStatus.Active;
+        
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
 #region Pilot-specific properties
         public string? Experience { get; set; } = null;

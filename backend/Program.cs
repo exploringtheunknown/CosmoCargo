@@ -101,6 +101,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IPilotService, PilotService>();
+builder.Services.AddScoped<RiskAssessmentService>();
+builder.Services.AddScoped<CustomsDeclarationValidator>();
 
 var app = builder.Build();
 
@@ -140,5 +142,6 @@ app.Put("/api/pilots/{id}", PilotEndpoints.UpdatePilot, ["Admin"]);
 app.Post("/api/pilots", PilotEndpoints.CreatePilot, ["Admin"]);
 app.Get("/api/users/me", UserEndpoints.GetMe);
 app.Put("/api/users/me", UserEndpoints.UpdateMe);
+app.MapCustomsDeclarationEndpoints();
 
 app.Run();

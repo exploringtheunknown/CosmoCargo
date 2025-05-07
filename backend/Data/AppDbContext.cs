@@ -11,6 +11,7 @@ namespace CosmoCargo.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Shipment> Shipments { get; set; }
+        public DbSet<CustomsDeclaration> CustomsDeclarations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -76,6 +77,10 @@ namespace CosmoCargo.Data
                 entity.Property(e => e.Status).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.UpdatedAt).IsRequired();
+
+                entity.HasOne(s => s.CustomsDeclaration)
+                    .WithOne(c => c.Shipment)
+                    .HasForeignKey<CustomsDeclaration>(c => c.ShipmentId);
             });
         }
     }

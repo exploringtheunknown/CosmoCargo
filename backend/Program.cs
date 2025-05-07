@@ -7,8 +7,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
-using CosmoCargo.Utils;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using CosmoCargo.Utils;
+using CosmoCargo.Validation;
+using CosmoCargo.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -123,7 +125,15 @@ using (var scope = app.Services.CreateScope())
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Ett fel uppstod vid initialisering av databasen.");
-        throw;
+                
+        if (ex.ToString().Contains("relation") && ex.ToString().Contains("already exists"))
+        {
+            logger.LogWarning("Tabeller existerar redan. Fortsätter applikationsstart.");
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 

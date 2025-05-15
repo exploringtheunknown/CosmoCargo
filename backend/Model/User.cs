@@ -17,7 +17,9 @@ namespace CosmoCargo.Model
         public bool? IsActive { get; set; } = null;
         
         // Navigation properties
+        [JsonIgnore]
         public virtual ICollection<Shipment>? CustomerShipments { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Shipment>? PilotShipments { get; set; }
     }
 }

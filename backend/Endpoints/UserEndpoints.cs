@@ -38,6 +38,14 @@ namespace CosmoCargo.Endpoints
             await userService.UpdateUserAsync(userId, request.Name);
             return Results.Ok();
         }
+
+        public static RouteGroupBuilder MapUserEndpoints(this IEndpointRouteBuilder app)
+        {
+            var group = app.MapGroup("/api/users");
+            group.MapGet("/me", GetMe);
+            group.MapPut("/me", UpdateMe);
+            return group;
+        }
     }
 
     public class UpdateUserRequest

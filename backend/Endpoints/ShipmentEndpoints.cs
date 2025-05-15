@@ -126,6 +126,17 @@ namespace CosmoCargo.Endpoints
 
             return Results.Ok(updatedShipment);
         }
+
+        public static RouteGroupBuilder MapShipmentEndpoints(this IEndpointRouteBuilder app)
+        {
+            var group = app.MapGroup("/api/shipments");
+            group.MapGet("/", GetShipments);
+            group.MapGet("/{id}", GetShipmentById);
+            group.MapPost("/", CreateShipment).RequireAuthorization("Customer");
+            group.MapPut("/{id}/status", UpdateShipmentStatus).RequireAuthorization("Pilot", "Admin");
+            group.MapPut("/{id}/assign", AssignPilot).RequireAuthorization("Admin");
+            return group;
+        }
     }
 
     public class LocationDto

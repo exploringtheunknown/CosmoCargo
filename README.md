@@ -32,7 +32,7 @@
 
 ### Kör lokalt
 
-1. Starta hela systemet med Docker:
+1. Säkerställ att Docker är startat och starta sedan  hela systemet med Docker:
 ```bash
 docker compose up --detach --build
 ```

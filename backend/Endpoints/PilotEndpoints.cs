@@ -86,6 +86,18 @@ namespace CosmoCargo.Endpoints
             var id = await pilotService.CreatePilotAsync(request.Name, request.Email, request.Experience);
             return Results.Ok(id);
         }
+
+        public static RouteGroupBuilder MapPilotEndpoints(this IEndpointRouteBuilder app)
+        {
+            var group = app.MapGroup("/api/pilots");
+            group.MapGet("/", GetPilots).RequireAuthorization("Admin");
+            group.MapGet("/{id}", GetPilotById).RequireAuthorization("Admin");
+            group.MapGet("/{id}/availability", GetPilotAvailability).RequireAuthorization("Admin");
+            group.MapPut("/{id}/status", UpdatePilotStatus).RequireAuthorization("Admin");
+            group.MapPut("/{id}", UpdatePilot).RequireAuthorization("Admin");
+            group.MapPost("/", CreatePilot).RequireAuthorization("Admin");
+            return group;
+        }
     }
 
     public class UpdatePilotStatusRequest

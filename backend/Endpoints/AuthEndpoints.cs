@@ -42,6 +42,13 @@ namespace CosmoCargo.Endpoints
 
             return Results.Ok("");
         }
+
+        public static RouteGroupBuilder MapAuthEndpoints(this IEndpointRouteBuilder app)
+        {
+            var group = app.MapGroup("/api/auth");
+            group.MapPost("/login", Login).AllowAnonymous();
+            return group;
+        }
     }
 
     public class LoginRequest

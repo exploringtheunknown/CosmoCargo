@@ -6,5 +6,12 @@ namespace CosmoCargo.Endpoints
         {
             return Results.Ok();
         }
+
+        public static RouteGroupBuilder MapHealthcheckEndpoints(this IEndpointRouteBuilder app)
+        {
+            var group = app.MapGroup("/api/healthcheck");
+            group.MapGet("/ping", Ping).AllowAnonymous();
+            return group;
+        }
     }
 } 

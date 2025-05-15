@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CosmoCargo.Model
 {
     public class Shipment
@@ -21,7 +23,9 @@ namespace CosmoCargo.Model
         public DateTime UpdatedAt { get; set; }
 
         // Navigation properties
+        [JsonIgnore]
         public virtual User Customer { get; set; } = null!;
+        [JsonIgnore]
         public virtual User? Pilot { get; set; }
     }
 }

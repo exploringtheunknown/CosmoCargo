@@ -125,20 +125,27 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.GetAnonymous("/api/healthcheck/ping", HealthcheckEndpoints.Ping);
-app.PostAnonymous("/api/auth/login", AuthEndpoints.Login);
-app.Get("/api/shipments", ShipmentEndpoints.GetShipments);
-app.Get("/api/shipments/{id}", ShipmentEndpoints.GetShipmentById);
-app.Post("/api/shipments", ShipmentEndpoints.CreateShipment, ["Customer"]);
-app.Put("/api/shipments/{id}/status", ShipmentEndpoints.UpdateShipmentStatus, ["Pilot", "Admin"]);
-app.Put("/api/shipments/{id}/assign", ShipmentEndpoints.AssignPilot, ["Admin"]);
-app.Get("/api/pilots", PilotEndpoints.GetPilots, ["Admin"]);
-app.Get("/api/pilots/{id}", PilotEndpoints.GetPilotById, ["Admin"]);
-app.Get("/api/pilots/{id}/availability", PilotEndpoints.GetPilotAvailability, ["Admin"]);
-app.Put("/api/pilots/{id}/status", PilotEndpoints.UpdatePilotStatus, ["Admin"]);
-app.Put("/api/pilots/{id}", PilotEndpoints.UpdatePilot, ["Admin"]);
-app.Post("/api/pilots", PilotEndpoints.CreatePilot, ["Admin"]);
-app.Get("/api/users/me", UserEndpoints.GetMe);
-app.Put("/api/users/me", UserEndpoints.UpdateMe);
+// Register endpoint groups
+app.MapHealthcheckEndpoints();
+app.MapAuthEndpoints();
+app.MapShipmentEndpoints();
+app.MapPilotEndpoints();
+app.MapUserEndpoints();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync("{\"error\":\"An unexpected error occurred.\"}");
+    });
+});
 
 app.Run();

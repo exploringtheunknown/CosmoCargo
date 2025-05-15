@@ -55,9 +55,9 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowLocalFrontend", policy =>
     {
-        policy.WithOrigins(["http://localhost:3000", "http://localhost:3001"])
+        policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -96,7 +96,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddCosmoCargoAuthorization();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
@@ -106,24 +106,11 @@ var app = builder.Build();
 
 app.MapOpenApi();
 app.MapScalarApiReference();
-app.UseCors();
+app.UseCors("AllowLocalFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        await DbInitializer.InitializeAsync(services);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ett fel uppstod vid initialisering av databasen.");
-        throw;
-    }
-}
+await app.MigrateAndSeedDatabaseAsync();
 
 // Register endpoint groups
 app.MapHealthcheckEndpoints();

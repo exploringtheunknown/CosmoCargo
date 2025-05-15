@@ -13,7 +13,9 @@ namespace CosmoCargo.Endpoints
             ClaimsPrincipal user)
         {
             var role = user.GetRole();
-            var userId = user.GetUserId();
+            var unauthorized = EndpointHelpers.TryGetUserIdOrUnauthorized(user, out var userId);
+            if (unauthorized != null)
+                return unauthorized;
 
             PaginatedResult<Shipment> result;
 
@@ -39,7 +41,9 @@ namespace CosmoCargo.Endpoints
                 return Results.NotFound();
 
             var role = user.GetRole();
-            var userId = user.GetUserId();
+            var unauthorized = EndpointHelpers.TryGetUserIdOrUnauthorized(user, out var userId);
+            if (unauthorized != null)
+                return unauthorized;
 
             if (role == UserRole.Admin.ToString())
                 return Results.Ok(shipment);
@@ -56,7 +60,9 @@ namespace CosmoCargo.Endpoints
             IShipmentService shipmentService,
             ClaimsPrincipal user)
         {
-            var userId = user.GetUserId();
+            var unauthorized = EndpointHelpers.TryGetUserIdOrUnauthorized(user, out var userId);
+            if (unauthorized != null)
+                return unauthorized;
 
             var shipment = new Shipment
             {
@@ -94,7 +100,9 @@ namespace CosmoCargo.Endpoints
             ClaimsPrincipal user)
         {
             var role = user.GetRole();
-            var userId = user.GetUserId();
+            var unauthorized = EndpointHelpers.TryGetUserIdOrUnauthorized(user, out var userId);
+            if (unauthorized != null)
+                return unauthorized;
 
             var shipment = await shipmentService.GetShipmentByIdAsync(id);
             if (shipment == null)

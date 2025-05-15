@@ -12,7 +12,9 @@ namespace CosmoCargo.Endpoints
             IUserService userService,
             ClaimsPrincipal user)
         {
-            var userId = user.GetUserId();
+            var unauthorized = EndpointHelpers.TryGetUserIdOrUnauthorized(user, out var userId);
+            if (unauthorized != null)
+                return unauthorized;
             var currentUser = await userService.GetUserByIdAsync(userId);
             if (currentUser == null)
                 return Results.NotFound();
@@ -34,7 +36,9 @@ namespace CosmoCargo.Endpoints
             IUserService userService,
             ClaimsPrincipal user)
         {
-            var userId = user.GetUserId();
+            var unauthorized = EndpointHelpers.TryGetUserIdOrUnauthorized(user, out var userId);
+            if (unauthorized != null)
+                return unauthorized;
             await userService.UpdateUserAsync(userId, request.Name);
             return Results.Ok();
         }

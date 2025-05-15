@@ -27,6 +27,17 @@ async function apiRequest<T>(
         },
     });
 
+    if (response.status === 401) {
+        if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+        }
+        return {
+            data: null as any,
+            status: 401,
+            ok: false,
+        };
+    }
+
     const data = await response.json();
     return {
         data,

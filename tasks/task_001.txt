@@ -1,0 +1,31 @@
+# Task ID: 1
+# Title: Setup Project Repository
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Create a new Git repository for the Chaos Engine project and initialize it with basic structure.
+# Details:
+Initialize a Git repository in a suitable location. Create a README file, LICENSE, and initial structure like src/, tests/, etc.
+
+# Test Strategy:
+Clone the repository to ensure it's initialized correctly.
+
+# Subtasks:
+## 1. Initialize Git Repository [done]
+### Dependencies: None
+### Description: Create a new Git repository in the Chaos Engine project directory and initialize it.
+### Details:
+Run 'git init' in the project root directory. Create an initial README.md file with project details and a LICENSE file (e.g., MIT). Commit these files to the repository.
+
+## 2. Create Basic Project Structure [done]
+### Dependencies: 1.1
+### Description: Set up the basic directory structure for the Chaos Engine project.
+### Details:
+Create directories such as 'src', 'tests', and 'docs'. Ensure each directory has appropriate README files describing its purpose.
+
+## 3. Configure Version Control [done]
+### Dependencies: 1.1
+### Description: Set up Git hooks, branches (e.g., main, develop), and any necessary configurations to ensure a healthy development workflow.
+### Details:
+Create a .git/hooks directory for any custom hooks. Configure branch protection rules on the remote repository if applicable. Set up initial branches such as 'main' and 'develop'.
+

@@ -1,0 +1,31 @@
+# Task ID: 3
+# Title: Implement Chaos Event Engine
+# Status: pending
+# Dependencies: 1
+# Priority: high
+# Description: Develop the logic for generating random events based on weighted probabilities.
+# Details:
+Create a service that generates events. Use a weighted random selection algorithm to choose an event.
+
+# Test Strategy:
+Write unit tests for the event generation logic.
+
+# Subtasks:
+## 1. Design Weighted Random Selection Algorithm [pending]
+### Dependencies: None
+### Description: Create a function that selects an event based on its weighted probability.
+### Details:
+Develop the algorithm in a separate file. Ensure it can handle multiple events and their respective weights.
+
+## 2. Implement Event Generation Service [pending]
+### Dependencies: 3.1
+### Description: Build a service that uses the weighted random algorithm to generate an event.
+### Details:
+Create a RESTful API endpoint that triggers the event generation. Store events in a database for future reference.
+
+## 3. Configure and Test Event Engine [pending]
+### Dependencies: 3.2
+### Description: Set up the backend to run the event generation service and test it with different inputs.
+### Details:
+Deploy the service in a development environment. Run end-to-end tests to ensure events are generated as expected.
+

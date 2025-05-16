@@ -1,0 +1,31 @@
+# Task ID: 6
+# Title: Implement API Endpoints for Event Log and Admin Control
+# Status: pending
+# Dependencies: 1, 2, 4
+# Priority: high
+# Description: Develop endpoints to retrieve event logs and control admin functions.
+# Details:
+Create ASP.NET Core controllers with actions to get event logs and manage engine settings. Implement authentication for admin-only access.
+
+# Test Strategy:
+Write integration tests to ensure endpoints return correct data and handle edge cases.
+
+# Subtasks:
+## 1. Create ASP.NET Core Controller for Event Log Retrieval [pending]
+### Dependencies: None
+### Description: Develop an ASP.NET Core controller that includes actions to retrieve event logs from the database.
+### Details:
+Use Entity Framework Core to query and return event logs. Implement necessary filters based on user roles or permissions.
+
+## 2. Create ASP.NET Core Controller for Admin Function Management [pending]
+### Dependencies: 6.1
+### Description: Develop an ASP.NET Core controller with actions to manage engine settings, ensuring only admin users can access these endpoints.
+### Details:
+Implement logic to validate user roles before allowing modifications to engine settings. Use dependency injection for any services needed.
+
+## 3. Implement Authentication and Authorization Mechanisms [pending]
+### Dependencies: 6.1, 6.2
+### Description: Set up authentication and authorization mechanisms to ensure that only authorized users can access both event log retrieval and admin functions.
+### Details:
+Integrate ASP.NET Core Identity for user management. Use custom policies or roles to control access to admin endpoints.
+

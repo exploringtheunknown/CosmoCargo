@@ -1,6 +1,6 @@
 # Task ID: 3
 # Title: Implement Chaos Event Engine
-# Status: pending
+# Status: in-progress
 # Dependencies: 1
 # Priority: high
 # Description: Develop the logic for generating random events based on weighted probabilities.
@@ -28,4 +28,99 @@ Create a RESTful API endpoint that triggers the event generation. Store events i
 ### Description: Set up the backend to run the event generation service and test it with different inputs.
 ### Details:
 Deploy the service in a development environment. Run end-to-end tests to ensure events are generated as expected.
+
+## 4. Design Chaos Event Definitions Database Schema [in-progress]
+### Dependencies: None
+### Description: Create a database table (e.g., chaos_event_definitions) to store chaos event types, weights, and descriptions. Update the EF Core model and add a migration.
+### Details:
+Define the entity and migration for chaos event definitions. Fields: Id (PK), Name, Weight, Description, and any other relevant metadata. Ensure the schema supports extensibility for future event properties.
+
+## 5. Implement Weighted Random Selection Service [done]
+### Dependencies: None
+### Description: Design and implement a standalone service/class that selects a chaos event based on weights from the database. The service should be reusable and testable.
+### Details:
+Create a C# service (e.g., WeightedRandomSelector or ChaosEventSelector) that takes a list of ChaosEventDefinition objects (with weights) and returns a randomly selected event, weighted by probability. Ensure the implementation is unit testable and does not depend on external state. Document the algorithm and usage.
+<info added on 2025-05-16T10:39:08.641Z>
+<p>Implementation Plan for Weighted Random Selection Service:</p>
+<ul>
+<li>Create a new C# class in backend/Services, e.g., WeightedRandomSelector or ChaosEventSelector.</li>
+<li>The service will expose a method: SelectEvent(IEnumerable&lt;ChaosEventDefinition&gt; events) -> ChaosEventDefinition.</li>
+<li>The method will:</li>
+<ul>
+<li>Sum all weights.</li>
+<li>Generate a random number between 0 and the total weight.</li>
+<li>Iterate through the events, subtracting each weight, and return the event where the running total crosses the random value.</li>
+</ul>
+<li>The service will be stateless and testable (no external dependencies).</li>
+<li>Add XML documentation to the class and method.</li>
+<li>Add a unit test for the selection logic (in a new or existing test project).</li>
+<li>Document usage in code comments and/or README if needed.</li>
+</ul>
+The implementation should ensure that it does not depend on EF or database context in the selection logic itself; the caller is responsible for providing the list of events.
+</info added on 2025-05-16T10:39:08.641Z>
+
+## 6. Integrate Weighted Selector into Chaos Event Engine [done]
+### Dependencies: None
+### Description: Use the WeightedRandomSelector service to select chaos events based on definitions and weights from the database. Integrate this logic into the chaos event engine workflow.
+### Details:
+Fetch chaos event definitions from the database, use the WeightedRandomSelector to select an event, and apply the selected event to a shipment. Ensure the integration is testable and follows project conventions. Add comments and documentation as needed.
+<info added on 2025-05-16T10:56:13.788Z>
+Implementation Plan:
+
+1. Create or update a ChaosEventEngine service/class in backend/Services.
+2. Inject AppDbContext and WeightedRandomSelector into the engine.
+3. Add a method (e.g., SelectAndApplyChaosEventToShipment) that:
+   - Fetches all active ChaosEventDefinition records from the database.
+   - Uses WeightedRandomSelector.SelectEvent to pick an event.
+   - Applies the selected event's logic to a shipment (mutation logic may be stubbed or implemented as needed).
+   - Logs the event to ChaosEventLog.
+4. Ensure the method is testable (accepts shipment as parameter, returns result, etc.).
+5. Add XML documentation and comments.
+6. Add or update tests for the integration logic.
+</info added on 2025-05-16T10:56:13.788Z>
+
+## 7. Implement Shipment Mutation Logic for Chaos Events [done]
+### Dependencies: None
+### Description: Expand the ChaosEventEngine to mutate shipments based on the selected chaos event. Each event type should have specific mutation logic (e.g., delay, status change, etc.). Ensure changes are persisted and auditable.
+### Details:
+For each chaos event type, define the corresponding mutation to the shipment (e.g., delay delivery, change status, add notes). Update the ChaosEventEngine to apply these mutations after selecting an event. Ensure the logic is extensible for future event types. Add comments and documentation. Update tests to cover mutation logic.
+<info added on 2025-05-16T10:58:19.723Z>
+<p>Review current chaos event types (AsteroidStrike, PirateAttack, SolarFlare, EngineFailure, CustomsInspection).</p>
+<p>For each event type, define a mutation to apply to the Shipment entity (e.g., delay delivery, change status, add notes, etc.).</p>
+<p>Update ChaosEventEngine.SelectAndApplyChaosEventToShipmentAsync to:</p>
+<ul>
+<li>Switch on selected event type</li>
+<li>Apply the corresponding mutation to the shipment</li>
+<li>Save changes to the database</li>
+<li>Log the mutation details in ChaosEventLog.ImpactDetails</li>
+</ul>
+<p>Ensure the logic is extensible for future event types (e.g., use a strategy pattern or switch statement).</p>
+<p>Add XML documentation and comments for maintainability.</p>
+<p>Update or add tests to cover the mutation logic for each event type.</p>
+</info added on 2025-05-16T10:58:19.723Z>
+
+## 8. Integrate Chaos Event Engine with BackgroundService Scheduler [in-progress]
+### Dependencies: None
+### Description: Implement a .NET BackgroundService that periodically selects a random shipment and applies a chaos event using the ChaosEventEngine. Ensure the interval is configurable and the service is robust to errors.
+### Details:
+Create a new BackgroundService (e.g., ChaosEventScheduler) in backend/Services. On a configurable interval, select a random eligible shipment, use ChaosEventEngine to apply a chaos event, and log the result. Handle errors gracefully and ensure the service can be enabled/disabled via configuration or database flag. Add comments and documentation. Update tests to cover the scheduler logic.
+<info added on 2025-05-16T12:44:20.341Z>
+<p><strong>Implementation Plan for BackgroundService Scheduler Integration:</strong></p>
+<ul>
+<li>Create a new class <code>ChaosEventScheduler</code> that inherits from <code>BackgroundService</code> in <code>backend/Services</code>.</li>
+<li>Inject <code>AppDbContext</code>, <code>ChaosEventEngine</code>, and configuration (for interval and enable/disable flag).</li>
+<li>In <code>ExecuteAsync</code>, on each interval:</li>
+<ul>
+<li>Check if chaos engine is enabled (from config or DB flag).</li>
+<li>Select a random eligible shipment (e.g., not delivered/cancelled).</li>
+<li>Use <code>ChaosEventEngine</code> to apply a chaos event to the shipment.</li>
+<li>Log the result (success/failure) using standard logging.</li>
+</ul>
+<li>Make the interval configurable via <code>appsettings.json</code> or database.</li>
+<li>Handle errors gracefully (log and continue loop).</li>
+<li>Add XML documentation and comments for maintainability.</li>
+<li>Register the service in <code>Startup/Program.cs</code> for DI.</li>
+<li>Add or update tests to cover the scheduler logic.</li>
+</ul>
+</info added on 2025-05-16T12:44:20.341Z>
 

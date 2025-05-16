@@ -1,6 +1,6 @@
 # Task ID: 2
 # Title: Define Data Model & Migration for ChaosEventLog
-# Status: pending
+# Status: done
 # Dependencies: 1
 # Priority: high
 # Description: Design the database schema for the ChaosEventLog table and create migrations.
@@ -17,25 +17,25 @@ Run database migrations and verify if the table is created correctly.
 ### Details:
 Use C# classes to represent the fields in the ChaosEventLog table. Ensure all necessary properties are included and properly annotated for EF Core's model configuration.
 
-## 2. Create Initial Migration [pending]
+## 2. Create Initial Migration [done]
 ### Dependencies: 2.1
 ### Description: Generate initial migration scripts for the ChaosEventLog table using Entity Framework Core commands.
 ### Details:
 Run 'Add-Migration InitialChaosEventLog' command and ensure it creates the correct migration script that can be applied to the database.
 
-## 3. Review and Apply Migrations [pending]
+## 3. Review and Apply Migrations [done]
 ### Dependencies: 2.2
 ### Description: Review the generated migrations, make any necessary adjustments, and apply them to the production database.
 ### Details:
 Carefully review the migration scripts for any errors or inconsistencies. Once verified, run 'Update-Database' to update the production database schema.
 
-## 4. Define and Add Necessary Indexes to ChaosEventLog [pending]
+## 4. Define and Add Necessary Indexes to ChaosEventLog [done]
 ### Dependencies: None
 ### Description: Identify and add indexes to ChaosEventLog fields (e.g., Timestamp, ShipmentId, EventType) for query performance. Update migration/model configuration accordingly.
 ### Details:
 Analyze expected query patterns and add indexes to relevant fields in the ChaosEventLog table. Update the migration or model configuration to include these indexes.
 
-## 5. Document the ChaosEventLog Schema and Migration Process [pending]
+## 5. Document the ChaosEventLog Schema and Migration Process [done]
 ### Dependencies: None
 ### Description: Add documentation (in code comments or a README) describing the schema, field purposes, and migration steps.
 ### Details:

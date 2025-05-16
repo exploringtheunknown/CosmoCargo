@@ -44,7 +44,7 @@
       "id": 2,
       "title": "Define Data Model & Migration for ChaosEventLog",
       "description": "Design the database schema for the ChaosEventLog table and create migrations.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         1
       ],
@@ -69,7 +69,7 @@
             1
           ],
           "details": "Run 'Add-Migration InitialChaosEventLog' command and ensure it creates the correct migration script that can be applied to the database.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Apply the migration to a test database and verify that the ChaosEventLog table is created with all necessary fields."
         },
         {
@@ -80,7 +80,7 @@
             2
           ],
           "details": "Carefully review the migration scripts for any errors or inconsistencies. Once verified, run 'Update-Database' to update the production database schema.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Query the database directly after applying migrations to ensure that all tables and columns are present and correctly configured."
         },
         {
@@ -88,7 +88,7 @@
           "title": "Define and Add Necessary Indexes to ChaosEventLog",
           "description": "Identify and add indexes to ChaosEventLog fields (e.g., Timestamp, ShipmentId, EventType) for query performance. Update migration/model configuration accordingly.",
           "details": "Analyze expected query patterns and add indexes to relevant fields in the ChaosEventLog table. Update the migration or model configuration to include these indexes.",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 2
         },
@@ -97,7 +97,7 @@
           "title": "Document the ChaosEventLog Schema and Migration Process",
           "description": "Add documentation (in code comments or a README) describing the schema, field purposes, and migration steps.",
           "details": "Document the ChaosEventLog table structure, field purposes, and any special considerations. Include migration steps and manual actions if needed. Ensure documentation is clear and up to date.",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 2
         }
@@ -107,7 +107,7 @@
       "id": 3,
       "title": "Implement Chaos Event Engine",
       "description": "Develop the logic for generating random events based on weighted probabilities.",
-      "status": "pending",
+      "status": "in-progress",
       "dependencies": [
         1
       ],
@@ -145,6 +145,51 @@
           "details": "Deploy the service in a development environment. Run end-to-end tests to ensure events are generated as expected.",
           "status": "pending",
           "testStrategy": "Automated tests for the entire pipeline, including the service's interaction with the database."
+        },
+        {
+          "id": 4,
+          "title": "Design Chaos Event Definitions Database Schema",
+          "description": "Create a database table (e.g., chaos_event_definitions) to store chaos event types, weights, and descriptions. Update the EF Core model and add a migration.",
+          "details": "Define the entity and migration for chaos event definitions. Fields: Id (PK), Name, Weight, Description, and any other relevant metadata. Ensure the schema supports extensibility for future event properties.",
+          "status": "in-progress",
+          "dependencies": [],
+          "parentTaskId": 3
+        },
+        {
+          "id": 5,
+          "title": "Implement Weighted Random Selection Service",
+          "description": "Design and implement a standalone service/class that selects a chaos event based on weights from the database. The service should be reusable and testable.",
+          "details": "Create a C# service (e.g., WeightedRandomSelector or ChaosEventSelector) that takes a list of ChaosEventDefinition objects (with weights) and returns a randomly selected event, weighted by probability. Ensure the implementation is unit testable and does not depend on external state. Document the algorithm and usage.\n<info added on 2025-05-16T10:39:08.641Z>\n<p>Implementation Plan for Weighted Random Selection Service:</p>\n<ul>\n<li>Create a new C# class in backend/Services, e.g., WeightedRandomSelector or ChaosEventSelector.</li>\n<li>The service will expose a method: SelectEvent(IEnumerable&lt;ChaosEventDefinition&gt; events) -> ChaosEventDefinition.</li>\n<li>The method will:</li>\n<ul>\n<li>Sum all weights.</li>\n<li>Generate a random number between 0 and the total weight.</li>\n<li>Iterate through the events, subtracting each weight, and return the event where the running total crosses the random value.</li>\n</ul>\n<li>The service will be stateless and testable (no external dependencies).</li>\n<li>Add XML documentation to the class and method.</li>\n<li>Add a unit test for the selection logic (in a new or existing test project).</li>\n<li>Document usage in code comments and/or README if needed.</li>\n</ul>\nThe implementation should ensure that it does not depend on EF or database context in the selection logic itself; the caller is responsible for providing the list of events.\n</info added on 2025-05-16T10:39:08.641Z>",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 3
+        },
+        {
+          "id": 6,
+          "title": "Integrate Weighted Selector into Chaos Event Engine",
+          "description": "Use the WeightedRandomSelector service to select chaos events based on definitions and weights from the database. Integrate this logic into the chaos event engine workflow.",
+          "details": "Fetch chaos event definitions from the database, use the WeightedRandomSelector to select an event, and apply the selected event to a shipment. Ensure the integration is testable and follows project conventions. Add comments and documentation as needed.\n<info added on 2025-05-16T10:56:13.788Z>\nImplementation Plan:\n\n1. Create or update a ChaosEventEngine service/class in backend/Services.\n2. Inject AppDbContext and WeightedRandomSelector into the engine.\n3. Add a method (e.g., SelectAndApplyChaosEventToShipment) that:\n   - Fetches all active ChaosEventDefinition records from the database.\n   - Uses WeightedRandomSelector.SelectEvent to pick an event.\n   - Applies the selected event's logic to a shipment (mutation logic may be stubbed or implemented as needed).\n   - Logs the event to ChaosEventLog.\n4. Ensure the method is testable (accepts shipment as parameter, returns result, etc.).\n5. Add XML documentation and comments.\n6. Add or update tests for the integration logic.\n</info added on 2025-05-16T10:56:13.788Z>",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 3
+        },
+        {
+          "id": 7,
+          "title": "Implement Shipment Mutation Logic for Chaos Events",
+          "description": "Expand the ChaosEventEngine to mutate shipments based on the selected chaos event. Each event type should have specific mutation logic (e.g., delay, status change, etc.). Ensure changes are persisted and auditable.",
+          "details": "For each chaos event type, define the corresponding mutation to the shipment (e.g., delay delivery, change status, add notes). Update the ChaosEventEngine to apply these mutations after selecting an event. Ensure the logic is extensible for future event types. Add comments and documentation. Update tests to cover mutation logic.\n<info added on 2025-05-16T10:58:19.723Z>\n<p>Review current chaos event types (AsteroidStrike, PirateAttack, SolarFlare, EngineFailure, CustomsInspection).</p>\n<p>For each event type, define a mutation to apply to the Shipment entity (e.g., delay delivery, change status, add notes, etc.).</p>\n<p>Update ChaosEventEngine.SelectAndApplyChaosEventToShipmentAsync to:</p>\n<ul>\n<li>Switch on selected event type</li>\n<li>Apply the corresponding mutation to the shipment</li>\n<li>Save changes to the database</li>\n<li>Log the mutation details in ChaosEventLog.ImpactDetails</li>\n</ul>\n<p>Ensure the logic is extensible for future event types (e.g., use a strategy pattern or switch statement).</p>\n<p>Add XML documentation and comments for maintainability.</p>\n<p>Update or add tests to cover the mutation logic for each event type.</p>\n</info added on 2025-05-16T10:58:19.723Z>",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 3
+        },
+        {
+          "id": 8,
+          "title": "Integrate Chaos Event Engine with BackgroundService Scheduler",
+          "description": "Implement a .NET BackgroundService that periodically selects a random shipment and applies a chaos event using the ChaosEventEngine. Ensure the interval is configurable and the service is robust to errors.",
+          "details": "Create a new BackgroundService (e.g., ChaosEventScheduler) in backend/Services. On a configurable interval, select a random eligible shipment, use ChaosEventEngine to apply a chaos event, and log the result. Handle errors gracefully and ensure the service can be enabled/disabled via configuration or database flag. Add comments and documentation. Update tests to cover the scheduler logic.\n<info added on 2025-05-16T12:44:20.341Z>\n<p><strong>Implementation Plan for BackgroundService Scheduler Integration:</strong></p>\n<ul>\n<li>Create a new class <code>ChaosEventScheduler</code> that inherits from <code>BackgroundService</code> in <code>backend/Services</code>.</li>\n<li>Inject <code>AppDbContext</code>, <code>ChaosEventEngine</code>, and configuration (for interval and enable/disable flag).</li>\n<li>In <code>ExecuteAsync</code>, on each interval:</li>\n<ul>\n<li>Check if chaos engine is enabled (from config or DB flag).</li>\n<li>Select a random eligible shipment (e.g., not delivered/cancelled).</li>\n<li>Use <code>ChaosEventEngine</code> to apply a chaos event to the shipment.</li>\n<li>Log the result (success/failure) using standard logging.</li>\n</ul>\n<li>Make the interval configurable via <code>appsettings.json</code> or database.</li>\n<li>Handle errors gracefully (log and continue loop).</li>\n<li>Add XML documentation and comments for maintainability.</li>\n<li>Register the service in <code>Startup/Program.cs</code> for DI.</li>\n<li>Add or update tests to cover the scheduler logic.</li>\n</ul>\n</info added on 2025-05-16T12:44:20.341Z>",
+          "status": "in-progress",
+          "dependencies": [],
+          "parentTaskId": 3
         }
       ]
     },

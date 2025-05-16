@@ -106,6 +106,9 @@ builder.Services.AddCosmoCargoAuthorization();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IPilotService, PilotService>();
+builder.Services.AddScoped<WeightedRandomSelector>();
+builder.Services.AddScoped<ChaosEventEngine>();
+builder.Services.AddHostedService<ChaosEventScheduler>();
 
 var app = builder.Build();
 

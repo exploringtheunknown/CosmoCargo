@@ -137,6 +137,9 @@ namespace CosmoCargo.Data
             ");
             await context.Database.MigrateAsync();
 
+            // Seed chaos event definitions
+            await SeedChaosEventDefinitions(serviceProvider);
+
             if (await context.Users.AnyAsync())
                 return;
 
@@ -696,6 +699,28 @@ namespace CosmoCargo.Data
             });
 
             Log("Shipment seeding completed!");
+        }
+
+        private static async Task SeedChaosEventDefinitions(IServiceProvider serviceProvider)
+        {
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            if (await context.ChaosEventDefinitions.AnyAsync())
+                return; // Already seeded
+
+            var events = new List<ChaosEventDefinition>
+            {
+                new() { Name = "AsteroidStrike", Weight = 10, Description = "Shipment delayed by asteroid impact" },
+                new() { Name = "PirateAttack", Weight = 7, Description = "Shipment weight set to zero by pirates" },
+                new() { Name = "Wormhole", Weight = 5, Description = "Destination changed due to wormhole" },
+                new() { Name = "BioSensorVirus", Weight = 3, Description = "Lifeform flag set to 'Instabil'" },
+                new() { Name = "BlackHole", Weight = 2, Description = "Status changed to 'Försvunnen i svart hål'" },
+                new() { Name = "AIUprising", Weight = 1, Description = "Pilot and destination changed to 'Okänd'" }
+            };
+
+            await context.ChaosEventDefinitions.AddRangeAsync(events);
+            await context.SaveChangesAsync();
         }
     }
 }

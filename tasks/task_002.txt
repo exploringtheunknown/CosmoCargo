@@ -11,7 +11,7 @@ Use Entity Framework Core to define the ChaosEventLog model. Create migration sc
 Run database migrations and verify if the table is created correctly.
 
 # Subtasks:
-## 1. Define ChaosEventLog Entity Model [pending]
+## 1. Define ChaosEventLog Entity Model [done]
 ### Dependencies: None
 ### Description: Create the entity model for ChaosEventLog using Entity Framework Core.
 ### Details:
@@ -28,4 +28,16 @@ Run 'Add-Migration InitialChaosEventLog' command and ensure it creates the corre
 ### Description: Review the generated migrations, make any necessary adjustments, and apply them to the production database.
 ### Details:
 Carefully review the migration scripts for any errors or inconsistencies. Once verified, run 'Update-Database' to update the production database schema.
+
+## 4. Define and Add Necessary Indexes to ChaosEventLog [pending]
+### Dependencies: None
+### Description: Identify and add indexes to ChaosEventLog fields (e.g., Timestamp, ShipmentId, EventType) for query performance. Update migration/model configuration accordingly.
+### Details:
+Analyze expected query patterns and add indexes to relevant fields in the ChaosEventLog table. Update the migration or model configuration to include these indexes.
+
+## 5. Document the ChaosEventLog Schema and Migration Process [pending]
+### Dependencies: None
+### Description: Add documentation (in code comments or a README) describing the schema, field purposes, and migration steps.
+### Details:
+Document the ChaosEventLog table structure, field purposes, and any special considerations. Include migration steps and manual actions if needed. Ensure documentation is clear and up to date.
 

@@ -58,7 +58,7 @@
           "description": "Create the entity model for ChaosEventLog using Entity Framework Core.",
           "dependencies": [],
           "details": "Use C# classes to represent the fields in the ChaosEventLog table. Ensure all necessary properties are included and properly annotated for EF Core's model configuration.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Unit test the entity model to ensure it correctly maps to the database schema."
         },
         {
@@ -82,6 +82,24 @@
           "details": "Carefully review the migration scripts for any errors or inconsistencies. Once verified, run 'Update-Database' to update the production database schema.",
           "status": "pending",
           "testStrategy": "Query the database directly after applying migrations to ensure that all tables and columns are present and correctly configured."
+        },
+        {
+          "id": 4,
+          "title": "Define and Add Necessary Indexes to ChaosEventLog",
+          "description": "Identify and add indexes to ChaosEventLog fields (e.g., Timestamp, ShipmentId, EventType) for query performance. Update migration/model configuration accordingly.",
+          "details": "Analyze expected query patterns and add indexes to relevant fields in the ChaosEventLog table. Update the migration or model configuration to include these indexes.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 2
+        },
+        {
+          "id": 5,
+          "title": "Document the ChaosEventLog Schema and Migration Process",
+          "description": "Add documentation (in code comments or a README) describing the schema, field purposes, and migration steps.",
+          "details": "Document the ChaosEventLog table structure, field purposes, and any special considerations. Include migration steps and manual actions if needed. Ensure documentation is clear and up to date.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 2
         }
       ]
     },

@@ -11,6 +11,7 @@ namespace CosmoCargo.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Shipment> Shipments { get; set; }
+        public DbSet<ChaosEventLog> ChaosEventLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -76,6 +77,19 @@ namespace CosmoCargo.Data
                 entity.Property(e => e.Status).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.UpdatedAt).IsRequired();
+            });
+
+            modelBuilder.Entity<ChaosEventLog>(entity =>
+            {
+                entity.ToTable("chaos_event_logs");
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+                entity.Property(e => e.Timestamp).IsRequired();
+                entity.Property(e => e.ShipmentId).IsRequired();
+                entity.Property(e => e.EventType).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.EventDescription).HasMaxLength(500);
+                entity.Property(e => e.ImpactDetails).HasMaxLength(2000);
+                // Indexes and relationships can be added in a later subtask
             });
         }
     }

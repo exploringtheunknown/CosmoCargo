@@ -12,21 +12,29 @@ namespace CosmoCargo.Endpoints
             [AsParameters] ShipmentsFilter filter,
             ClaimsPrincipal user)
         {
-            var role = user.GetRole();
             var unauthorized = EndpointHelpers.TryGetUserIdOrUnauthorized(user, out var userId);
             if (unauthorized != null)
                 return unauthorized;
 
-            PaginatedResult<Shipment> result;
+            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+            if (forbidden != null)
+                return forbidden;
 
-            if (role == UserRole.Admin.ToString())
-                result = await shipmentService.GetShipmentsAsync(filter);
-            else if (role == UserRole.Pilot.ToString())
-                result = await shipmentService.GetShipmentsByPilotIdAsync(userId, filter);
-            else if (role == UserRole.Customer.ToString())
-                result = await shipmentService.GetShipmentsByCustomerIdAsync(userId, filter);
-            else
-                return Results.Forbid();
+            PaginatedResult<Shipment> result;
+            switch (role)
+            {
+                case UserRole.Admin:
+                    result = await shipmentService.GetShipmentsAsync(filter);
+                    break;
+                case UserRole.Pilot:
+                    result = await shipmentService.GetShipmentsByPilotIdAsync(userId, filter);
+                    break;
+                case UserRole.Customer:
+                    result = await shipmentService.GetShipmentsByCustomerIdAsync(userId, filter);
+                    break;
+                default:
+                    return Results.Forbid();
+            }
 
             return Results.Ok(result);
         }
@@ -40,16 +48,19 @@ namespace CosmoCargo.Endpoints
             if (shipment == null)
                 return Results.NotFound();
 
-            var role = user.GetRole();
             var unauthorized = EndpointHelpers.TryGetUserIdOrUnauthorized(user, out var userId);
             if (unauthorized != null)
                 return unauthorized;
 
-            if (role == UserRole.Admin.ToString())
+            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+            if (forbidden != null)
+                return forbidden;
+
+            if (role == UserRole.Admin)
                 return Results.Ok(shipment);
-            else if (role == UserRole.Pilot.ToString() && shipment.PilotId == userId)
+            else if (role == UserRole.Pilot && shipment.PilotId == userId)
                 return Results.Ok(shipment);
-            else if (role == UserRole.Customer.ToString() && shipment.CustomerId == userId)
+            else if (role == UserRole.Customer && shipment.CustomerId == userId)
                 return Results.Ok(shipment);
 
             return Results.NotFound();
@@ -63,6 +74,10 @@ namespace CosmoCargo.Endpoints
             var unauthorized = EndpointHelpers.TryGetUserIdOrUnauthorized(user, out var userId);
             if (unauthorized != null)
                 return unauthorized;
+
+            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+            if (forbidden != null)
+                return forbidden;
 
             var shipment = new Shipment
             {
@@ -99,16 +114,19 @@ namespace CosmoCargo.Endpoints
             IShipmentService shipmentService,
             ClaimsPrincipal user)
         {
-            var role = user.GetRole();
             var unauthorized = EndpointHelpers.TryGetUserIdOrUnauthorized(user, out var userId);
             if (unauthorized != null)
                 return unauthorized;
+
+            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+            if (forbidden != null)
+                return forbidden;
 
             var shipment = await shipmentService.GetShipmentByIdAsync(id);
             if (shipment == null)
                 return Results.NotFound();
 
-            if (role == UserRole.Pilot.ToString() && shipment.PilotId != userId)
+            if (role == UserRole.Pilot && shipment.PilotId != userId)
                 return Results.Forbid();
 
             var updatedShipment = await shipmentService.UpdateShipmentStatusAsync(id, request.Status);
@@ -124,8 +142,11 @@ namespace CosmoCargo.Endpoints
             IShipmentService shipmentService,
             ClaimsPrincipal user)
         {
-            var role = user.GetRole();
-            if (role != UserRole.Admin.ToString())
+            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+            if (forbidden != null)
+                return forbidden;
+
+            if (role != UserRole.Admin)
                 return Results.Forbid();
 
             var updatedShipment = await shipmentService.AssignPilotAsync(id, request.PilotId);

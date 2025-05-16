@@ -14,5 +14,14 @@ namespace CosmoCargo.Utils
             userId = id.Value;
             return null;
         }
+
+        public static IResult? TryGetUserRoleOrForbid(ClaimsPrincipal user, out CosmoCargo.Model.UserRole role)
+        {
+            role = default;
+            var roleString = user.GetRole();
+            if (!Enum.TryParse<CosmoCargo.Model.UserRole>(roleString, true, out role))
+                return Results.Forbid();
+            return null;
+        }
     }
 } 

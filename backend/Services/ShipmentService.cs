@@ -47,6 +47,7 @@ namespace CosmoCargo.Services
             
             var items = await query
                 .Include(s => s.Pilot)
+                .AsNoTracking()
                 .OrderByDescending(s => s.CreatedAt)
                 .Skip((filter.Page - 1) * filter.PageSize)
                 .Take(filter.PageSize)
@@ -64,6 +65,7 @@ namespace CosmoCargo.Services
             
             var items = await query
                 .Include(s => s.Pilot)
+                .AsNoTracking()
                 .OrderByDescending(s => s.CreatedAt)
                 .Skip((filter.Page - 1) * filter.PageSize)
                 .Take(filter.PageSize)
@@ -82,6 +84,7 @@ namespace CosmoCargo.Services
             var totalCount = await query.CountAsync();
             
             var items = await query
+                .AsNoTracking()
                 .OrderByDescending(s => s.CreatedAt)
                 .Skip((filter.Page - 1) * filter.PageSize)
                 .Take(filter.PageSize)

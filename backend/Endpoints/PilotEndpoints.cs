@@ -13,8 +13,10 @@ namespace CosmoCargo.Endpoints
             IPilotService pilotService,
             ClaimsPrincipal user)
         {
-            var role = user.GetRole();
-            if (role != UserRole.Admin.ToString())
+            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+            if (forbidden != null)
+                return forbidden;
+            if (role != UserRole.Admin)
                 return Results.Forbid();
 
             var pilots = await pilotService.GetAllPilotsAsync(filter);
@@ -26,8 +28,10 @@ namespace CosmoCargo.Endpoints
             IPilotService pilotService,
             ClaimsPrincipal user)
         {
-            var role = user.GetRole();
-            if (role != UserRole.Admin.ToString())
+            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+            if (forbidden != null)
+                return forbidden;
+            if (role != UserRole.Admin)
                 return Results.Forbid();
 
             var pilot = await pilotService.GetPilotByIdAsync(id);
@@ -42,8 +46,10 @@ namespace CosmoCargo.Endpoints
             IPilotService pilotService,
             ClaimsPrincipal user)
         {
-            var role = user.GetRole();
-            if (role != UserRole.Admin.ToString())
+            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+            if (forbidden != null)
+                return forbidden;
+            if (role != UserRole.Admin)
                 return Results.Forbid();
 
             var pilot = await pilotService.GetPilotByIdAsync(id);

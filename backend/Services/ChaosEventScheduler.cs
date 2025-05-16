@@ -50,19 +50,18 @@ namespace CosmoCargo.Services
                     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                     var engine = scope.ServiceProvider.GetRequiredService<ChaosEventEngine>();
 
-                    // Select a random eligible shipment (not Delivered or Cancelled)
-                    var eligible = await context.Shipments
+                    // Select a random eligible shipment (not Delivered or Cancelled) efficiently
+                    var shipment = await context.Shipments
                         .Where(s => s.Status != ShipmentStatus.Delivered && s.Status != ShipmentStatus.Cancelled)
-                        .ToListAsync(stoppingToken);
+                        .OrderBy(x => EF.Functions.Random())
+                        .FirstOrDefaultAsync(stoppingToken);
 
-                    if (eligible.Count == 0)
+                    if (shipment == null)
                     {
                         _logger.LogInformation("No eligible shipments for chaos event.");
                     }
                     else
                     {
-                        var random = new Random();
-                        var shipment = eligible[random.Next(eligible.Count)];
                         var (selectedEvent, logEntry) = await engine.SelectAndApplyChaosEventToShipmentAsync(shipment);
                         if (selectedEvent != null && logEntry != null)
                         {

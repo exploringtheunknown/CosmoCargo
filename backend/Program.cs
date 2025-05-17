@@ -126,6 +126,7 @@ app.MapAuthEndpoints();
 app.MapShipmentEndpoints();
 app.MapPilotEndpoints();
 app.MapUserEndpoints();
+app.MapChaosEventEndpoints();
 
 if (app.Environment.IsDevelopment())
 {

@@ -190,6 +190,24 @@
           "status": "in-progress",
           "dependencies": [],
           "parentTaskId": 3
+        },
+        {
+          "id": 9,
+          "title": "Implement API Endpoints for Chaos Event Log and Engine Control",
+          "description": "Add API endpoints to fetch chaos event logs (with pagination/filtering), enable/disable the chaos engine, and get engine status. Secure endpoints for admin use only.",
+          "details": "Create endpoints in the backend to: (1) Fetch chaos event logs (paginated, filterable by shipment/event type/date), (2) Enable/disable the chaos engine (update config or DB flag), (3) Get current chaos engine status. Ensure endpoints are protected for admin users only. Add OpenAPI documentation and tests as appropriate.",
+          "status": "in-progress",
+          "dependencies": [],
+          "parentTaskId": 3
+        },
+        {
+          "id": 10,
+          "title": "Frontend Integration for Chaos Engine Admin Controls",
+          "description": "Implement frontend UI for admin users to enable/disable chaos engine, view chaos event logs, and trigger individual chaos events on shipments. Integrate with new backend endpoints.",
+          "details": "1. Add admin UI controls to enable/disable chaos engine (toggle/switch).\n2. Display chaos event logs with pagination and filtering (by shipment, event type, date).\n3. Add a button to trigger a chaos event for a specific shipment (calls a new backend endpoint).\n4. Ensure all controls are admin-only and follow accessibility best practices.\n5. Use existing API endpoints and add a new endpoint for manual chaos event triggering if needed.\n6. Add tests for frontend logic and permissions.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 3
         }
       ]
     },

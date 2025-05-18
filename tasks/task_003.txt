@@ -1,6 +1,6 @@
 # Task ID: 3
 # Title: Implement Chaos Event Engine
-# Status: in-progress
+# Status: done
 # Dependencies: 1
 # Priority: high
 # Description: Develop the logic for generating random events based on weighted probabilities.
@@ -99,7 +99,7 @@ For each chaos event type, define the corresponding mutation to the shipment (e.
 <p>Update or add tests to cover the mutation logic for each event type.</p>
 </info added on 2025-05-16T10:58:19.723Z>
 
-## 8. Integrate Chaos Event Engine with BackgroundService Scheduler [in-progress]
+## 8. Integrate Chaos Event Engine with BackgroundService Scheduler [done]
 ### Dependencies: None
 ### Description: Implement a .NET BackgroundService that periodically selects a random shipment and applies a chaos event using the ChaosEventEngine. Ensure the interval is configurable and the service is robust to errors.
 ### Details:
@@ -124,13 +124,13 @@ Create a new BackgroundService (e.g., ChaosEventScheduler) in backend/Services. 
 </ul>
 </info added on 2025-05-16T12:44:20.341Z>
 
-## 9. Implement API Endpoints for Chaos Event Log and Engine Control [in-progress]
+## 9. Implement API Endpoints for Chaos Event Log and Engine Control [done]
 ### Dependencies: None
 ### Description: Add API endpoints to fetch chaos event logs (with pagination/filtering), enable/disable the chaos engine, and get engine status. Secure endpoints for admin use only.
 ### Details:
 Create endpoints in the backend to: (1) Fetch chaos event logs (paginated, filterable by shipment/event type/date), (2) Enable/disable the chaos engine (update config or DB flag), (3) Get current chaos engine status. Ensure endpoints are protected for admin users only. Add OpenAPI documentation and tests as appropriate.
 
-## 10. Frontend Integration for Chaos Engine Admin Controls [pending]
+## 10. Frontend Integration for Chaos Engine Admin Controls [done]
 ### Dependencies: None
 ### Description: Implement frontend UI for admin users to enable/disable chaos engine, view chaos event logs, and trigger individual chaos events on shipments. Integrate with new backend endpoints.
 ### Details:

@@ -107,7 +107,7 @@
       "id": 3,
       "title": "Implement Chaos Event Engine",
       "description": "Develop the logic for generating random events based on weighted probabilities.",
-      "status": "in-progress",
+      "status": "done",
       "dependencies": [
         1
       ],
@@ -187,7 +187,7 @@
           "title": "Integrate Chaos Event Engine with BackgroundService Scheduler",
           "description": "Implement a .NET BackgroundService that periodically selects a random shipment and applies a chaos event using the ChaosEventEngine. Ensure the interval is configurable and the service is robust to errors.",
           "details": "Create a new BackgroundService (e.g., ChaosEventScheduler) in backend/Services. On a configurable interval, select a random eligible shipment, use ChaosEventEngine to apply a chaos event, and log the result. Handle errors gracefully and ensure the service can be enabled/disabled via configuration or database flag. Add comments and documentation. Update tests to cover the scheduler logic.\n<info added on 2025-05-16T12:44:20.341Z>\n<p><strong>Implementation Plan for BackgroundService Scheduler Integration:</strong></p>\n<ul>\n<li>Create a new class <code>ChaosEventScheduler</code> that inherits from <code>BackgroundService</code> in <code>backend/Services</code>.</li>\n<li>Inject <code>AppDbContext</code>, <code>ChaosEventEngine</code>, and configuration (for interval and enable/disable flag).</li>\n<li>In <code>ExecuteAsync</code>, on each interval:</li>\n<ul>\n<li>Check if chaos engine is enabled (from config or DB flag).</li>\n<li>Select a random eligible shipment (e.g., not delivered/cancelled).</li>\n<li>Use <code>ChaosEventEngine</code> to apply a chaos event to the shipment.</li>\n<li>Log the result (success/failure) using standard logging.</li>\n</ul>\n<li>Make the interval configurable via <code>appsettings.json</code> or database.</li>\n<li>Handle errors gracefully (log and continue loop).</li>\n<li>Add XML documentation and comments for maintainability.</li>\n<li>Register the service in <code>Startup/Program.cs</code> for DI.</li>\n<li>Add or update tests to cover the scheduler logic.</li>\n</ul>\n</info added on 2025-05-16T12:44:20.341Z>",
-          "status": "in-progress",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 3
         },
@@ -196,7 +196,7 @@
           "title": "Implement API Endpoints for Chaos Event Log and Engine Control",
           "description": "Add API endpoints to fetch chaos event logs (with pagination/filtering), enable/disable the chaos engine, and get engine status. Secure endpoints for admin use only.",
           "details": "Create endpoints in the backend to: (1) Fetch chaos event logs (paginated, filterable by shipment/event type/date), (2) Enable/disable the chaos engine (update config or DB flag), (3) Get current chaos engine status. Ensure endpoints are protected for admin users only. Add OpenAPI documentation and tests as appropriate.",
-          "status": "in-progress",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 3
         },
@@ -205,7 +205,7 @@
           "title": "Frontend Integration for Chaos Engine Admin Controls",
           "description": "Implement frontend UI for admin users to enable/disable chaos engine, view chaos event logs, and trigger individual chaos events on shipments. Integrate with new backend endpoints.",
           "details": "1. Add admin UI controls to enable/disable chaos engine (toggle/switch).\n2. Display chaos event logs with pagination and filtering (by shipment, event type, date).\n3. Add a button to trigger a chaos event for a specific shipment (calls a new backend endpoint).\n4. Ensure all controls are admin-only and follow accessibility best practices.\n5. Use existing API endpoints and add a new endpoint for manual chaos event triggering if needed.\n6. Add tests for frontend logic and permissions.",
-          "status": "pending",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 3
         }

@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { api } from "@/services/api";
+import ManualChaosTriggerCard from "./ManualChaosTriggerCard";
 
 const EngineStatusCard: React.FC = () => {
   const [enabled, setEnabled] = useState<boolean | null>(null);
@@ -61,7 +62,7 @@ const EngineStatusCard: React.FC = () => {
   };
 
   return (
-    <Card>
+    <Card className="mb-6">
       <CardHeader>
         <CardTitle>Chaos Engine Status</CardTitle>
       </CardHeader>

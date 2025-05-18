@@ -4,9 +4,11 @@ import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Table } from "../ui/table";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
 import Pagination from "../ui/pagination";
 import { api } from "@/services/api";
+import { Badge } from "../ui/badge";
+import { format } from "date-fns";
 
 const PAGE_SIZE = 10;
 
@@ -87,26 +89,28 @@ const ChaosEventLogsCard: React.FC = () => {
           />
           <Button type="submit">Sök</Button>
         </form>
-        <Table>
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>ShipmentId</th>
-              <th>EventType</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            {logs.map((log, i) => (
-              <tr key={i}>
-                <td>{log.timestamp}</td>
-                <td>{log.shipmentId}</td>
-                <td>{log.eventType}</td>
-                <td>{log.eventDescription}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <div className="rounded-md border border-space-secondary bg-space-primary min-w-[700px] md:min-w-[900px] w-full max-w-5xl mx-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Tidpunkt</TableHead>
+                <TableHead>Typ</TableHead>
+                <TableHead>Beskrivning</TableHead>
+                <TableHead>Effekt</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {logs.map((log, i) => (
+                <TableRow key={i}>
+                  <TableCell>{format(new Date(log.timestamp), "yyyy-MM-dd HH:mm:ss")}</TableCell>
+                  <TableCell><Badge>{log.eventType}</Badge></TableCell>
+                  <TableCell>{log.eventDescription}</TableCell>
+                  <TableCell>{log.impactDetails}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
         <Pagination
           page={page}
           totalCount={total}

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CosmoCargo.Services
 {
@@ -22,12 +23,14 @@ namespace CosmoCargo.Services
         private readonly IConfiguration _configuration;
         private readonly TimeSpan _interval;
         private readonly bool _enabled;
+        private readonly IHubContext<ChaosEventsHub> _hubContext;
 
-        public ChaosEventScheduler(IServiceProvider serviceProvider, ILogger<ChaosEventScheduler> logger, IConfiguration configuration)
+        public ChaosEventScheduler(IServiceProvider serviceProvider, ILogger<ChaosEventScheduler> logger, IConfiguration configuration, IHubContext<ChaosEventsHub> hubContext)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
             _configuration = configuration;
+            _hubContext = hubContext;
             _interval = TimeSpan.FromSeconds(_configuration.GetValue<int>("ChaosEngine:IntervalSeconds", 60));
             _enabled = _configuration.GetValue<bool>("ChaosEngine:Enabled", true);
         }
@@ -66,6 +69,19 @@ namespace CosmoCargo.Services
                         if (selectedEvent != null && logEntry != null)
                         {
                             _logger.LogInformation("Applied chaos event '{Event}' to shipment {ShipmentId}. LogId: {LogId}", selectedEvent.Name, shipment.Id, logEntry.Id);
+                            await _hubContext.Clients.All.SendAsync(
+                                "ChaosEventOccurred",
+                                new
+                                {
+                                    id = logEntry.Id,
+                                    timestamp = logEntry.Timestamp,
+                                    shipmentId = logEntry.ShipmentId,
+                                    eventType = logEntry.EventType,
+                                    eventDescription = logEntry.EventDescription,
+                                    impactDetails = logEntry.ImpactDetails
+                                },
+                                stoppingToken
+                            );
                         }
                         else
                         {

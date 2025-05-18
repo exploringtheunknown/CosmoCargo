@@ -109,6 +109,7 @@ builder.Services.AddScoped<IPilotService, PilotService>();
 builder.Services.AddScoped<WeightedRandomSelector>();
 builder.Services.AddScoped<ChaosEventEngine>();
 builder.Services.AddHostedService<ChaosEventScheduler>();
+builder.Services.AddSignalR();
 
 // Ensure all JSON responses use camelCase property names
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
@@ -129,10 +130,11 @@ await app.MigrateAndSeedDatabaseAsync();
 // Register endpoint groups
 app.MapHealthcheckEndpoints();
 app.MapAuthEndpoints();
-app.MapShipmentEndpoints();
-app.MapPilotEndpoints();
-app.MapUserEndpoints();
-app.MapChaosEventEndpoints();
+app.MapShipmentEndpoints().AddEndpointFilter<CosmoCargo.Utils.ValidationFilter>();
+app.MapPilotEndpoints().AddEndpointFilter<CosmoCargo.Utils.ValidationFilter>();
+app.MapUserEndpoints().AddEndpointFilter<CosmoCargo.Utils.ValidationFilter>();
+app.MapChaosEventEndpoints().AddEndpointFilter<CosmoCargo.Utils.ValidationFilter>();
+app.MapHub<CosmoCargo.Services.ChaosEventsHub>("/hubs/chaos-events").RequireAuthorization("Admin");
 
 if (app.Environment.IsDevelopment())
 {

@@ -1,6 +1,6 @@
 # Task ID: 4
 # Title: Implement BackgroundService Scheduler
-# Status: pending
+# Status: done
 # Dependencies: 3
 # Priority: high
 # Description: Create a scheduler that triggers chaos events at specified intervals.
@@ -11,19 +11,19 @@ Use IHostedService or BackgroundService to schedule the event generation logic. 
 Test the scheduler with different intervals and verify it triggers events as expected.
 
 # Subtasks:
-## 1. Create BackgroundService Interface [pending]
+## 1. Create BackgroundService Interface [done]
 ### Dependencies: None
 ### Description: Define an interface for the background service that will handle chaos event scheduling.
 ### Details:
 Create an IHostedService or BackgroundService interface with a method to schedule chaos events at specified intervals. Use Dependency Injection to manage dependencies.
 
-## 2. Implement Scheduling Logic [pending]
+## 2. Implement Scheduling Logic [done]
 ### Dependencies: 4.1
 ### Description: Develop the logic that implements the scheduling of chaos events based on user-defined intervals.
 ### Details:
 Create a concrete implementation of the BackgroundService interface. Use the System.Threading.Timer or similar library to handle periodic execution of chaos events.
 
-## 3. Integrate with Chaos Event Engine [pending]
+## 3. Integrate with Chaos Event Engine [done]
 ### Dependencies: 4.2
 ### Description: Ensure the background service interacts properly with the Chaos Event Engine to generate and execute chaos events.
 ### Details:

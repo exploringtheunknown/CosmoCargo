@@ -3,6 +3,7 @@ using CosmoCargo.Model.Queries;
 using CosmoCargo.Services;
 using CosmoCargo.Utils;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 
 namespace CosmoCargo.Endpoints
 {
@@ -113,15 +114,29 @@ namespace CosmoCargo.Endpoints
 
     public class UpdatePilotRequest
     {
+        [Required]
+        [MinLength(3)]
+        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
+        [Required]
+        [EmailAddress]
+        [MaxLength(100)]
         public string Email { get; set; } = string.Empty;
+        [MaxLength(500)]
         public string? Experience { get; set; }
     }
 
     public class CreatePilotRequest
     {
+        [Required]
+        [MinLength(3)]
+        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
+        [Required]
+        [EmailAddress]
+        [MaxLength(100)]
         public string Email { get; set; } = string.Empty;
+        [MaxLength(500)]
         public string? Experience { get; set; }
     }
 } 

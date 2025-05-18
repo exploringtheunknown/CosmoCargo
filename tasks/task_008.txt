@@ -1,31 +1,31 @@
 # Task ID: 8
-# Title: Implement Configuration Management
-# Status: pending
-# Dependencies: 6
-# Priority: medium
-# Description: Add a feature to adjust the interval and probabilities of chaos events dynamically.
+# Title: Implement Security and Validation
+# Status: done
+# Dependencies: 2, 6, 7
+# Priority: high
+# Description: Ensure all components are secure, only accessible by admins, and validate input.
 # Details:
-Create an admin interface or API endpoints to update configuration settings. Ensure it persists changes in the database.
+Add authentication middleware to restrict access to admin-only features. Implement input validation throughout the application using .NET's BackgroundService.
 
 # Test Strategy:
-Test the configuration management with different values and verify they affect event behavior.
+Conduct security audits and penetration testing to ensure all vulnerabilities are addressed.
 
 # Subtasks:
-## 1. Design and Implement Configuration API Endpoints [pending]
+## 1. Implement Authentication Middleware [done]
 ### Dependencies: None
-### Description: Create RESTful API endpoints to receive configuration updates for chaos event intervals and probabilities.
+### Description: Add authentication middleware to restrict access to admin-only features in the backend.
 ### Details:
-Use a backend framework like Spring Boot or Express.js. Define endpoints such as PUT /config/interval and PUT /config/probability. Ensure proper validation and error handling.
+Create a JWT-based authentication system. Implement middleware that checks for valid tokens on all admin routes. Store user roles and permissions in tokens or session storage.
 
-## 2. Persist Configuration Changes in Database [pending]
+## 2. Validate Input Across Application [done]
 ### Dependencies: 8.1
-### Description: Modify the backend logic to save configuration changes to a database (e.g., PostgreSQL, MongoDB) whenever an API endpoint is called.
+### Description: Implement input validation throughout the application to prevent security vulnerabilities.
 ### Details:
-Use ORM tools like Hibernate or Mongoose. Ensure that each configuration setting is saved with a timestamp to track when it was last updated.
+Use libraries like Joi or Yup for validating data on all user inputs. Validate both frontend and backend inputs. Ensure that validations are consistent across different parts of the application.
 
-## 3. Develop Admin Interface for Configurations [pending]
+## 3. Secure Backend Endpoints [done]
 ### Dependencies: 8.1, 8.2
-### Description: Create an admin interface or use an existing one to allow administrators to view and update chaos event configurations.
+### Description: Ensure all backend endpoints are secure and only accessible by admins, following security best practices.
 ### Details:
-Use a frontend framework like React or Angular. Develop forms that display the current configuration settings and update them through the API endpoints implemented in subtask 1.
+Review and refine all backend API endpoints. Apply proper access control checks. Ensure that sensitive data is encrypted both in transit and at rest.
 

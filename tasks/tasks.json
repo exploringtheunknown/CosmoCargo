@@ -215,7 +215,7 @@
       "id": 4,
       "title": "Implement BackgroundService Scheduler",
       "description": "Create a scheduler that triggers chaos events at specified intervals.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         3
       ],
@@ -229,7 +229,7 @@
           "description": "Define an interface for the background service that will handle chaos event scheduling.",
           "dependencies": [],
           "details": "Create an IHostedService or BackgroundService interface with a method to schedule chaos events at specified intervals. Use Dependency Injection to manage dependencies.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Unit test the interface to ensure it correctly schedules and triggers events."
         },
         {
@@ -240,7 +240,7 @@
             1
           ],
           "details": "Create a concrete implementation of the BackgroundService interface. Use the System.Threading.Timer or similar library to handle periodic execution of chaos events.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Write integration tests to verify that the scheduler correctly triggers events at specified intervals."
         },
         {
@@ -251,7 +251,7 @@
             2
           ],
           "details": "Implement methods in the concrete BackgroundService class that interact with the Chaos Event Engine to schedule and trigger events. Ensure proper error handling and logging for event failures.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "End-to-end test the entire process, from scheduling through execution of chaos events, to ensure all components work together as expected."
         }
       ]
@@ -260,12 +260,12 @@
       "id": 5,
       "title": "Implement SignalR Hub for Real-Time Updates",
       "description": "Set up a SignalR hub to send real-time updates about chaos events.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
         1
       ],
       "priority": "high",
-      "details": "Create a SignalR hub that broadcasts event information. Ensure it can handle multiple clients.",
+      "details": "Create a SignalR hub that broadcasts event information. Ensure it can handle multiple clients using .NET's BackgroundService.",
       "testStrategy": "Test the hub with multiple instances and verify real-time updates.",
       "subtasks": [
         {
@@ -274,7 +274,7 @@
           "description": "Define the interface and methods that the SignalR hub will provide for broadcasting event information.",
           "dependencies": [],
           "details": "Implement an interface with methods like 'BroadcastEvent' to handle the sending of real-time updates. Use interfaces to define the contract for any implementing classes.",
-          "status": "pending",
+          "status": "completed",
           "testStrategy": "Unit test each method in isolation to ensure it correctly formats and sends data."
         },
         {
@@ -284,8 +284,8 @@
           "dependencies": [
             1
           ],
-          "details": "Develop a class that implements the previously defined interface and integrates with the SignalR core library to handle client connections and message broadcasting.",
-          "status": "pending",
+          "details": "Develop a class that implements the previously defined interface and integrates with the SignalR core library to handle client connections and message broadcasting. Use .NET's BackgroundService directly for background operations.",
+          "status": "done",
           "testStrategy": "Write integration tests to simulate the connection of multiple clients and verify that events are correctly broadcasted."
         },
         {
@@ -296,8 +296,17 @@
             2
           ],
           "details": "Add the necessary configuration to your application to register the SignalR hub. Ensure that the hub is accessible from the frontend through appropriate routing and middleware setup.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Perform end-to-end testing by simulating a client connecting and subscribing to events, then sending an event to verify it's received correctly."
+        },
+        {
+          "id": 4,
+          "title": "Implement Galactic Event Feed UI",
+          "description": "Create a real-time feed component (Galactic Event Feed) in the admin dashboard that displays the latest 10 chaos events applied to shipments. The feed should update live via SignalR and present events in a visually engaging, 'galactic' style.",
+          "details": "- Build a React component that subscribes to the SignalR chaos events hub.\n- Display the 10 most recent chaos events as they occur, updating in real time.\n- Use animations, icons, or cosmic visuals to make the feed feel 'galactic'.\n- Ensure accessibility and responsive design.\n- Only show to admin users.\n<info added on 2025-05-18T19:03:40.081Z>\n- Build a React component `GalacticEventFeed.tsx` in `frontend/src/components/admin/`.\n- Use the existing SignalR client utility (`createChaosEventsConnection` from `services/signalr.ts`) to subscribe to real-time chaos events.\n- Maintain a rolling list of the latest 10 events in state.\n- Render each event as a row in the card, using galactic-themed visuals (e.g., cosmic background, space icons, glowing badges, etc.).\n- Ensure accessibility: semantic HTML, keyboard navigation, ARIA labels, color contrast, and screen reader compatibility.\n- Add the feed card to the admin dashboard page (`/dashboard/admin`).\n- Theme: The feed will use the application's existing galactic/space theme, matching the color palette, backgrounds, and iconography already present in the UI. It will use the same card style as other admin dashboard cards for visual consistency.\n- Event Data: The SignalR event payload will include all fields from a chaos event, using camelCase property names (id, timestamp, shipmentId, eventType, eventDescription, impactDetails, etc.).\n- Component Plan:\n  1. Create a new React component `GalacticEventFeed.tsx` in `frontend/src/components/admin/`.\n  2. Use the existing SignalR client utility (`createChaosEventsConnection` from `services/signalr.ts`) to subscribe to real-time chaos events.\n  3. Maintain a rolling list of the latest 10 events in state.\n  4. Render each event as a row in the card, using galactic-themed visuals (e.g., cosmic background, space icons, glowing badges, etc.).\n  5. Ensure accessibility: semantic HTML, keyboard navigation, ARIA labels, color contrast, and screen reader compatibility.\n- Testing: Verify that the feed updates in real time as new chaos events are broadcast, and that the UI is accessible and visually consistent with the rest of the application.\n- Next: After implementation, review for accessibility and galactic theme polish, and update documentation as needed.\n</info added on 2025-05-18T19:03:40.081Z>",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 5
         }
       ]
     },
@@ -305,14 +314,13 @@
       "id": 6,
       "title": "Implement API Endpoints for Event Log and Admin Control",
       "description": "Develop endpoints to retrieve event logs and control admin functions.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
-        1,
         2,
         4
       ],
       "priority": "high",
-      "details": "Create ASP.NET Core controllers with actions to get event logs and manage engine settings. Implement authentication for admin-only access.",
+      "details": "Create ASP.NET Core controllers with actions to get event logs and manage engine settings. Implement authentication for admin-only access using .NET's BackgroundService.",
       "testStrategy": "Write integration tests to ensure endpoints return correct data and handle edge cases.",
       "subtasks": [
         {
@@ -321,7 +329,7 @@
           "description": "Develop an ASP.NET Core controller that includes actions to retrieve event logs from the database.",
           "dependencies": [],
           "details": "Use Entity Framework Core to query and return event logs. Implement necessary filters based on user roles or permissions.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Unit tests for controller methods using xUnit and Moq for mocking dependencies."
         },
         {
@@ -332,7 +340,7 @@
             1
           ],
           "details": "Implement logic to validate user roles before allowing modifications to engine settings. Use dependency injection for any services needed.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Unit tests and integration tests using xUnit and mocking the required dependencies."
         },
         {
@@ -344,7 +352,7 @@
             2
           ],
           "details": "Integrate ASP.NET Core Identity for user management. Use custom policies or roles to control access to admin endpoints.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Functional tests simulating various user scenarios to ensure correct authentication and authorization."
         }
       ]
@@ -353,13 +361,13 @@
       "id": 7,
       "title": "Develop Admin Control UI/Logic",
       "description": "Create the user interface for managing chaos engine settings.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
-        1,
+        2,
         6
       ],
       "priority": "high",
-      "details": "Design and implement a simple admin dashboard using Angular or React. Integrate it with the backend API to fetch and update settings.",
+      "details": "Design and implement a simple admin dashboard using Angular or React. Integrate it with the backend API to fetch and update settings using .NET's BackgroundService.",
       "testStrategy": "Test the UI for functionality, responsiveness, and security.",
       "subtasks": [
         {
@@ -368,7 +376,7 @@
           "description": "Create wireframes and mockups for the admin dashboard layout, focusing on usability and functionality.",
           "dependencies": [],
           "details": "Use tools like Figma or Sketch to design the UI. Ensure it includes sections for managing settings, viewing logs, and executing tests.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Manual review by designers to ensure adherence to user experience guidelines."
         },
         {
@@ -378,81 +386,44 @@
           "dependencies": [
             1
           ],
-          "details": "Use Node.js with Express or another framework to create API endpoints. Ensure these endpoints are secured using authentication tokens.",
-          "status": "pending",
-          "testStrategy": "Automated unit tests for each API endpoint. Manual testing of the dashboard's interaction with these endpoints."
+          "details": "Use a frontend framework like React or Angular. Develop forms that display the current configuration settings and update them through the API endpoints implemented in subtask 2.",
+          "status": "done",
+          "testStrategy": "Write end-to-end tests using tools like Cypress to simulate user interactions with the admin interface and verify that the configurations are updated correctly."
         },
         {
           "id": 3,
-          "title": "Build Admin Dashboard Frontend Implementation",
-          "description": "Develop the admin dashboard frontend using Angular or React, connecting it to the backend services.",
+          "title": "Secure Backend Endpoints",
+          "description": "Ensure all backend endpoints are secure and only accessible by admins, following security best practices.",
           "dependencies": [
             2
           ],
-          "details": "Create components for each section of the dashboard. Implement data fetching and updating logic using HTTP requests.",
-          "status": "pending",
-          "testStrategy": "Unit tests for individual components. End-to-end testing simulating user interaction with the dashboard."
+          "details": "Review and refine all backend API endpoints. Apply proper access control checks. Ensure that sensitive data is encrypted both in transit and at rest.",
+          "status": "done",
+          "testStrategy": "Conduct penetration testing to identify vulnerabilities. Perform code reviews for security flaws. Monitor production logs for unusual activity."
+        },
+        {
+          "id": 4,
+          "title": "UI for setting the probability table fields",
+          "description": "Add a panel to the chaos admin dashboard that allows admins to create, read, update, and delete entries in the chaos_event_definitions table (CRUD). This will enable management of chaos event types and their probability weights directly from the UI.",
+          "details": "Implement a React component/panel on the chaos dashboard for full CRUD operations on chaos_event_definitions. Integrate with backend endpoints for create, read, update, and delete. Ensure only admin users can access this panel. Include form validation, error handling, and accessibility best practices.",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 7
         }
       ]
     },
     {
       "id": 8,
-      "title": "Implement Configuration Management",
-      "description": "Add a feature to adjust the interval and probabilities of chaos events dynamically.",
-      "status": "pending",
-      "dependencies": [
-        6
-      ],
-      "priority": "medium",
-      "details": "Create an admin interface or API endpoints to update configuration settings. Ensure it persists changes in the database.",
-      "testStrategy": "Test the configuration management with different values and verify they affect event behavior.",
-      "subtasks": [
-        {
-          "id": 1,
-          "title": "Design and Implement Configuration API Endpoints",
-          "description": "Create RESTful API endpoints to receive configuration updates for chaos event intervals and probabilities.",
-          "dependencies": [],
-          "details": "Use a backend framework like Spring Boot or Express.js. Define endpoints such as PUT /config/interval and PUT /config/probability. Ensure proper validation and error handling.",
-          "status": "pending",
-          "testStrategy": "Write unit tests for each API endpoint using tools like JUnit or Jest to verify that they correctly update the configuration settings."
-        },
-        {
-          "id": 2,
-          "title": "Persist Configuration Changes in Database",
-          "description": "Modify the backend logic to save configuration changes to a database (e.g., PostgreSQL, MongoDB) whenever an API endpoint is called.",
-          "dependencies": [
-            1
-          ],
-          "details": "Use ORM tools like Hibernate or Mongoose. Ensure that each configuration setting is saved with a timestamp to track when it was last updated.",
-          "status": "pending",
-          "testStrategy": "Perform integration tests by calling the API endpoints and checking if the database entries are correctly updated."
-        },
-        {
-          "id": 3,
-          "title": "Develop Admin Interface for Configurations",
-          "description": "Create an admin interface or use an existing one to allow administrators to view and update chaos event configurations.",
-          "dependencies": [
-            1,
-            2
-          ],
-          "details": "Use a frontend framework like React or Angular. Develop forms that display the current configuration settings and update them through the API endpoints implemented in subtask 1.",
-          "status": "pending",
-          "testStrategy": "Write end-to-end tests using tools like Cypress to simulate user interactions with the admin interface and verify that the configurations are updated correctly."
-        }
-      ]
-    },
-    {
-      "id": 9,
       "title": "Implement Security and Validation",
       "description": "Ensure all components are secure, only accessible by admins, and validate input.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [
-        1,
+        2,
         6,
         7
       ],
       "priority": "high",
-      "details": "Add authentication middleware to restrict access to admin-only features. Implement input validation throughout the application.",
+      "details": "Add authentication middleware to restrict access to admin-only features. Implement input validation throughout the application using .NET's BackgroundService.",
       "testStrategy": "Conduct security audits and penetration testing to ensure all vulnerabilities are addressed.",
       "subtasks": [
         {
@@ -461,7 +432,7 @@
           "description": "Add authentication middleware to restrict access to admin-only features in the backend.",
           "dependencies": [],
           "details": "Create a JWT-based authentication system. Implement middleware that checks for valid tokens on all admin routes. Store user roles and permissions in tokens or session storage.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Write unit tests for authentication middleware functions. Simulate login scenarios to ensure proper token generation and validation."
         },
         {
@@ -472,7 +443,7 @@
             1
           ],
           "details": "Use libraries like Joi or Yup for validating data on all user inputs. Validate both frontend and backend inputs. Ensure that validations are consistent across different parts of the application.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Write unit tests for each validation function. Simulate various input scenarios to ensure comprehensive coverage."
         },
         {
@@ -484,7 +455,7 @@
             2
           ],
           "details": "Review and refine all backend API endpoints. Apply proper access control checks. Ensure that sensitive data is encrypted both in transit and at rest.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Conduct penetration testing to identify vulnerabilities. Perform code reviews for security flaws. Monitor production logs for unusual activity."
         }
       ]

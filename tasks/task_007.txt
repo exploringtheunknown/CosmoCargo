@@ -1,31 +1,37 @@
 # Task ID: 7
 # Title: Develop Admin Control UI/Logic
-# Status: pending
-# Dependencies: 1, 6
+# Status: done
+# Dependencies: 2, 6
 # Priority: high
 # Description: Create the user interface for managing chaos engine settings.
 # Details:
-Design and implement a simple admin dashboard using Angular or React. Integrate it with the backend API to fetch and update settings.
+Design and implement a simple admin dashboard using Angular or React. Integrate it with the backend API to fetch and update settings using .NET's BackgroundService.
 
 # Test Strategy:
 Test the UI for functionality, responsiveness, and security.
 
 # Subtasks:
-## 1. Design Admin Dashboard Layout [pending]
+## 1. Design Admin Dashboard Layout [done]
 ### Dependencies: None
 ### Description: Create wireframes and mockups for the admin dashboard layout, focusing on usability and functionality.
 ### Details:
 Use tools like Figma or Sketch to design the UI. Ensure it includes sections for managing settings, viewing logs, and executing tests.
 
-## 2. Develop Admin Dashboard Backend Integration [pending]
+## 2. Develop Admin Dashboard Backend Integration [done]
 ### Dependencies: 7.1
 ### Description: Implement backend services that the admin dashboard will use to fetch and update settings from the Chaos Engine.
 ### Details:
-Use Node.js with Express or another framework to create API endpoints. Ensure these endpoints are secured using authentication tokens.
+Use a frontend framework like React or Angular. Develop forms that display the current configuration settings and update them through the API endpoints implemented in subtask 2.
 
-## 3. Build Admin Dashboard Frontend Implementation [pending]
+## 3. Secure Backend Endpoints [done]
 ### Dependencies: 7.2
-### Description: Develop the admin dashboard frontend using Angular or React, connecting it to the backend services.
+### Description: Ensure all backend endpoints are secure and only accessible by admins, following security best practices.
 ### Details:
-Create components for each section of the dashboard. Implement data fetching and updating logic using HTTP requests.
+Review and refine all backend API endpoints. Apply proper access control checks. Ensure that sensitive data is encrypted both in transit and at rest.
+
+## 4. UI for setting the probability table fields [done]
+### Dependencies: None
+### Description: Add a panel to the chaos admin dashboard that allows admins to create, read, update, and delete entries in the chaos_event_definitions table (CRUD). This will enable management of chaos event types and their probability weights directly from the UI.
+### Details:
+Implement a React component/panel on the chaos dashboard for full CRUD operations on chaos_event_definitions. Integrate with backend endpoints for create, read, update, and delete. Ensure only admin users can access this panel. Include form validation, error handling, and accessibility best practices.
 

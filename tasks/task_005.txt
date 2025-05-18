@@ -1,31 +1,59 @@
 # Task ID: 5
 # Title: Implement SignalR Hub for Real-Time Updates
-# Status: pending
+# Status: done
 # Dependencies: 1
 # Priority: high
 # Description: Set up a SignalR hub to send real-time updates about chaos events.
 # Details:
-Create a SignalR hub that broadcasts event information. Ensure it can handle multiple clients.
+Create a SignalR hub that broadcasts event information. Ensure it can handle multiple clients using .NET's BackgroundService.
 
 # Test Strategy:
 Test the hub with multiple instances and verify real-time updates.
 
 # Subtasks:
-## 1. Create SignalR Hub Interface [pending]
+## 1. Create SignalR Hub Interface [completed]
 ### Dependencies: None
 ### Description: Define the interface and methods that the SignalR hub will provide for broadcasting event information.
 ### Details:
 Implement an interface with methods like 'BroadcastEvent' to handle the sending of real-time updates. Use interfaces to define the contract for any implementing classes.
 
-## 2. Implement SignalR Hub Class [pending]
+## 2. Implement SignalR Hub Class [done]
 ### Dependencies: 5.1
 ### Description: Create a concrete implementation of the SignalR hub that uses the defined interface to broadcast event information.
 ### Details:
-Develop a class that implements the previously defined interface and integrates with the SignalR core library to handle client connections and message broadcasting.
+Develop a class that implements the previously defined interface and integrates with the SignalR core library to handle client connections and message broadcasting. Use .NET's BackgroundService directly for background operations.
 
-## 3. Configure SignalR in Application [pending]
+## 3. Configure SignalR in Application [done]
 ### Dependencies: 5.2
 ### Description: Integrate the SignalR hub into the application's configuration and ensure it starts up correctly when the application launches.
 ### Details:
 Add the necessary configuration to your application to register the SignalR hub. Ensure that the hub is accessible from the frontend through appropriate routing and middleware setup.
+
+## 4. Implement Galactic Event Feed UI [done]
+### Dependencies: None
+### Description: Create a real-time feed component (Galactic Event Feed) in the admin dashboard that displays the latest 10 chaos events applied to shipments. The feed should update live via SignalR and present events in a visually engaging, 'galactic' style.
+### Details:
+- Build a React component that subscribes to the SignalR chaos events hub.
+- Display the 10 most recent chaos events as they occur, updating in real time.
+- Use animations, icons, or cosmic visuals to make the feed feel 'galactic'.
+- Ensure accessibility and responsive design.
+- Only show to admin users.
+<info added on 2025-05-18T19:03:40.081Z>
+- Build a React component `GalacticEventFeed.tsx` in `frontend/src/components/admin/`.
+- Use the existing SignalR client utility (`createChaosEventsConnection` from `services/signalr.ts`) to subscribe to real-time chaos events.
+- Maintain a rolling list of the latest 10 events in state.
+- Render each event as a row in the card, using galactic-themed visuals (e.g., cosmic background, space icons, glowing badges, etc.).
+- Ensure accessibility: semantic HTML, keyboard navigation, ARIA labels, color contrast, and screen reader compatibility.
+- Add the feed card to the admin dashboard page (`/dashboard/admin`).
+- Theme: The feed will use the application's existing galactic/space theme, matching the color palette, backgrounds, and iconography already present in the UI. It will use the same card style as other admin dashboard cards for visual consistency.
+- Event Data: The SignalR event payload will include all fields from a chaos event, using camelCase property names (id, timestamp, shipmentId, eventType, eventDescription, impactDetails, etc.).
+- Component Plan:
+  1. Create a new React component `GalacticEventFeed.tsx` in `frontend/src/components/admin/`.
+  2. Use the existing SignalR client utility (`createChaosEventsConnection` from `services/signalr.ts`) to subscribe to real-time chaos events.
+  3. Maintain a rolling list of the latest 10 events in state.
+  4. Render each event as a row in the card, using galactic-themed visuals (e.g., cosmic background, space icons, glowing badges, etc.).
+  5. Ensure accessibility: semantic HTML, keyboard navigation, ARIA labels, color contrast, and screen reader compatibility.
+- Testing: Verify that the feed updates in real time as new chaos events are broadcast, and that the UI is accessible and visually consistent with the rest of the application.
+- Next: After implementation, review for accessibility and galactic theme polish, and update documentation as needed.
+</info added on 2025-05-18T19:03:40.081Z>
 

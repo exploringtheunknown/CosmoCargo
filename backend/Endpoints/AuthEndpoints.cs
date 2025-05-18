@@ -2,6 +2,7 @@ using CosmoCargo.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 
 namespace CosmoCargo.Endpoints
 {
@@ -53,7 +54,10 @@ namespace CosmoCargo.Endpoints
 
     public class LoginRequest
     {
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
+        [Required]
         public string Password { get; set; } = string.Empty;
     }
 }

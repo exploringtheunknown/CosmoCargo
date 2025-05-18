@@ -6,6 +6,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import EngineStatusCard from "@/components/admin/EngineStatusCard";
 import ChaosEventLogsCard from "@/components/admin/ChaosEventLogsCard";
 import ManualChaosTriggerCard from "@/components/admin/ManualChaosTriggerCard";
+import ChaosEventDefinitionsPanel from "@/components/admin/ChaosEventDefinitionsPanel";
+import GalacticEventFeed from "@/components/admin/GalacticEventFeed";
 
 const AdminDashboardPage = () => {
   const { user } = useAuth();
@@ -31,8 +33,10 @@ const AdminDashboardPage = () => {
   return (
     <div className="container mx-auto py-8 grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <EngineStatusCard />
+      <ChaosEventDefinitionsPanel />
       <ChaosEventLogsCard />
       <ManualChaosTriggerCard />
+      <GalacticEventFeed />
     </div>
   );
 };

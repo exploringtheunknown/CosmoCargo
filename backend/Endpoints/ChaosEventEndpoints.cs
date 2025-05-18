@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using CosmoCargo.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace CosmoCargo.Endpoints
 {
@@ -81,6 +82,58 @@ namespace CosmoCargo.Endpoints
             return Results.Ok(new { IntervalSeconds = request.IntervalSeconds });
         }
 
+        public static async Task<IResult> GetChaosEventDefinitions(AppDbContext db)
+        {
+            var defs = await db.ChaosEventDefinitions.OrderBy(d => d.Name).ToListAsync();
+            return Results.Ok(defs);
+        }
+
+        public class ChaosEventDefinitionRequest
+        {
+            [Required]
+            [MinLength(3)]
+            [MaxLength(100)]
+            public string Name { get; set; } = string.Empty;
+            [Required]
+            [Range(0.01, 1000)]
+            public double Weight { get; set; }
+            [MaxLength(500)]
+            public string? Description { get; set; }
+        }
+
+        public static async Task<IResult> CreateChaosEventDefinition(ChaosEventDefinitionRequest req, AppDbContext db)
+        {
+            if (string.IsNullOrWhiteSpace(req.Name) || req.Weight <= 0)
+                return Results.BadRequest("Name and positive weight required.");
+            var exists = await db.ChaosEventDefinitions.AnyAsync(d => d.Name == req.Name);
+            if (exists)
+                return Results.Conflict("Event with this name already exists.");
+            var def = new ChaosEventDefinition { Name = req.Name, Weight = req.Weight, Description = req.Description };
+            db.ChaosEventDefinitions.Add(def);
+            await db.SaveChangesAsync();
+            return Results.Created($"/api/chaos-events/definitions/{def.Id}", def);
+        }
+
+        public static async Task<IResult> UpdateChaosEventDefinition(int id, ChaosEventDefinitionRequest req, AppDbContext db)
+        {
+            var def = await db.ChaosEventDefinitions.FindAsync(id);
+            if (def == null) return Results.NotFound();
+            if (!string.IsNullOrWhiteSpace(req.Name)) def.Name = req.Name;
+            if (req.Weight > 0) def.Weight = req.Weight;
+            def.Description = req.Description;
+            await db.SaveChangesAsync();
+            return Results.Ok(def);
+        }
+
+        public static async Task<IResult> DeleteChaosEventDefinition(int id, AppDbContext db)
+        {
+            var def = await db.ChaosEventDefinitions.FindAsync(id);
+            if (def == null) return Results.NotFound();
+            db.ChaosEventDefinitions.Remove(def);
+            await db.SaveChangesAsync();
+            return Results.NoContent();
+        }
+
         public static RouteGroupBuilder MapChaosEventEndpoints(this IEndpointRouteBuilder app)
         {
             var group = app.MapGroup("/api/chaos-events");
@@ -90,6 +143,10 @@ namespace CosmoCargo.Endpoints
             group.MapPost("/disable", DisableChaosEngine).RequireAuthorization("Admin");
             group.MapPost("/trigger", TriggerChaosEvent).RequireAuthorization("Admin");
             group.MapPost("/interval", UpdateChaosEngineInterval).RequireAuthorization("Admin");
+            group.MapGet("/definitions", GetChaosEventDefinitions).RequireAuthorization("Admin");
+            group.MapPost("/definitions", CreateChaosEventDefinition).RequireAuthorization("Admin");
+            group.MapPut("/definitions/{id:int}", UpdateChaosEventDefinition).RequireAuthorization("Admin");
+            group.MapDelete("/definitions/{id:int}", DeleteChaosEventDefinition).RequireAuthorization("Admin");
             return group;
         }
 
@@ -111,11 +168,13 @@ namespace CosmoCargo.Endpoints
 
     public class IntervalRequest
     {
+        [Range(1, 86400)]
         public int IntervalSeconds { get; set; }
     }
 
     public class TriggerChaosEventRequest
     {
+        [Required]
         public Guid ShipmentId { get; set; }
     }
 } 

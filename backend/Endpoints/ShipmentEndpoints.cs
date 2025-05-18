@@ -3,6 +3,7 @@ using CosmoCargo.Model.Queries;
 using CosmoCargo.Services;
 using CosmoCargo.Utils;
 using System.Security.Claims;
+using System.ComponentModel.DataAnnotations;
 namespace CosmoCargo.Endpoints
 {
     public static class ShipmentEndpoints
@@ -170,30 +171,54 @@ namespace CosmoCargo.Endpoints
 
     public class LocationDto
     {
+        [Required]
+        [MinLength(3)]
+        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
+        [Required]
+        [MinLength(2)]
+        [MaxLength(100)]
         public string Planet { get; set; } = string.Empty;
+        [Required]
+        [MinLength(2)]
+        [MaxLength(100)]
         public string Station { get; set; } = string.Empty;
     }
 
     public class CreateShipmentRequest
     {
+        [Required]
         public LocationDto Origin { get; set; } = new();
+        [Required]
         public LocationDto Destination { get; set; } = new();
+        [Required]
+        [Range(0.01, 100000)]
         public decimal Weight { get; set; }
+        [Required]
+        [MinLength(2)]
+        [MaxLength(50)]
         public string Category { get; set; } = string.Empty;
+        [Required]
+        [MinLength(2)]
+        [MaxLength(50)]
         public string Priority { get; set; } = string.Empty;
+        [MaxLength(500)]
         public string? Description { get; set; }
         public bool HasInsurance { get; set; }
     }
 
     public class UpdateShipmentStatusRequest
     {
+        [Required]
         public ShipmentStatus Status { get; set; }
     }
 
     public class AssignPilotRequest
     {
+        [Required]
         public Guid PilotId { get; set; }
     }
 }

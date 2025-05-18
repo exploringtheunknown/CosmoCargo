@@ -11,25 +11,25 @@ Create a service that generates events. Use a weighted random selection algorith
 Write unit tests for the event generation logic.
 
 # Subtasks:
-## 1. Design Weighted Random Selection Algorithm [pending]
+## 1. Design Weighted Random Selection Algorithm [done]
 ### Dependencies: None
 ### Description: Create a function that selects an event based on its weighted probability.
 ### Details:
 Develop the algorithm in a separate file. Ensure it can handle multiple events and their respective weights.
 
-## 2. Implement Event Generation Service [pending]
+## 2. Implement Event Generation Service [done]
 ### Dependencies: 3.1
 ### Description: Build a service that uses the weighted random algorithm to generate an event.
 ### Details:
 Create a RESTful API endpoint that triggers the event generation. Store events in a database for future reference.
 
-## 3. Configure and Test Event Engine [pending]
+## 3. Configure and Test Event Engine [done]
 ### Dependencies: 3.2
 ### Description: Set up the backend to run the event generation service and test it with different inputs.
 ### Details:
 Deploy the service in a development environment. Run end-to-end tests to ensure events are generated as expected.
 
-## 4. Design Chaos Event Definitions Database Schema [in-progress]
+## 4. Design Chaos Event Definitions Database Schema [done]
 ### Dependencies: None
 ### Description: Create a database table (e.g., chaos_event_definitions) to store chaos event types, weights, and descriptions. Update the EF Core model and add a migration.
 ### Details:

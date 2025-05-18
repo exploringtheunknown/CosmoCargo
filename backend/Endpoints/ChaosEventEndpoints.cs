@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using CosmoCargo.Services;
 
 namespace CosmoCargo.Endpoints
 {
@@ -16,8 +17,6 @@ namespace CosmoCargo.Endpoints
             AppDbContext db,
             ClaimsPrincipal user)
         {
-            if (!IsAdmin(user)) return Results.Forbid();
-
             var query = db.ChaosEventLogs.AsQueryable();
             if (filter.ShipmentId.HasValue)
                 query = query.Where(e => e.ShipmentId == filter.ShipmentId);
@@ -40,7 +39,6 @@ namespace CosmoCargo.Endpoints
 
         public static IResult GetChaosEngineStatus(IConfiguration config, ClaimsPrincipal user)
         {
-            if (!IsAdmin(user)) return Results.Forbid();
             var enabled = config.GetValue<bool>("ChaosEngine:Enabled", true);
             var interval = config.GetValue<int>("ChaosEngine:IntervalSeconds", 60);
             return Results.Ok(new { Enabled = enabled, IntervalSeconds = interval });
@@ -48,7 +46,6 @@ namespace CosmoCargo.Endpoints
 
         public static IResult EnableChaosEngine(IConfiguration config, ClaimsPrincipal user)
         {
-            if (!IsAdmin(user)) return Results.Forbid();
             // NOTE: This only updates in-memory config. For persistent change, update appsettings or use DB flag.
             config["ChaosEngine:Enabled"] = "true";
             return Results.Ok(new { Enabled = true });
@@ -56,25 +53,32 @@ namespace CosmoCargo.Endpoints
 
         public static IResult DisableChaosEngine(IConfiguration config, ClaimsPrincipal user)
         {
-            if (!IsAdmin(user)) return Results.Forbid();
             config["ChaosEngine:Enabled"] = "false";
             return Results.Ok(new { Enabled = false });
         }
 
         public static async Task<IResult> TriggerChaosEvent(
-            Guid shipmentId,
+            TriggerChaosEventRequest request,
             AppDbContext db,
             ChaosEventEngine engine,
             ClaimsPrincipal user)
         {
-            if (!IsAdmin(user)) return Results.Forbid();
-            var shipment = await db.Shipments.FindAsync(shipmentId);
+            var shipment = await db.Shipments.FindAsync(request.ShipmentId);
             if (shipment == null)
-                return Results.NotFound($"Shipment {shipmentId} not found.");
+                return Results.NotFound($"Shipment {request.ShipmentId} not found.");
             var (selectedEvent, logEntry) = await engine.SelectAndApplyChaosEventToShipmentAsync(shipment);
             if (selectedEvent == null || logEntry == null)
                 return Results.BadRequest("No chaos event could be applied.");
             return Results.Ok(new { Event = selectedEvent, Log = logEntry });
+        }
+
+        public static IResult UpdateChaosEngineInterval(
+            IConfiguration config,
+            IntervalRequest request,
+            ClaimsPrincipal user)
+        {
+            config["ChaosEngine:IntervalSeconds"] = request.IntervalSeconds.ToString();
+            return Results.Ok(new { IntervalSeconds = request.IntervalSeconds });
         }
 
         public static RouteGroupBuilder MapChaosEventEndpoints(this IEndpointRouteBuilder app)
@@ -85,6 +89,7 @@ namespace CosmoCargo.Endpoints
             group.MapPost("/enable", EnableChaosEngine).RequireAuthorization("Admin");
             group.MapPost("/disable", DisableChaosEngine).RequireAuthorization("Admin");
             group.MapPost("/trigger", TriggerChaosEvent).RequireAuthorization("Admin");
+            group.MapPost("/interval", UpdateChaosEngineInterval).RequireAuthorization("Admin");
             return group;
         }
 
@@ -102,5 +107,15 @@ namespace CosmoCargo.Endpoints
         public DateTime? To { get; set; }
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 20;
+    }
+
+    public class IntervalRequest
+    {
+        public int IntervalSeconds { get; set; }
+    }
+
+    public class TriggerChaosEventRequest
+    {
+        public Guid ShipmentId { get; set; }
     }
 } 

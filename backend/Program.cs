@@ -48,7 +48,7 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "Bearer"
                 }
             },
-            Array.Empty<string>()
+            []
         }
     });
 });
@@ -109,6 +109,12 @@ builder.Services.AddScoped<IPilotService, PilotService>();
 builder.Services.AddScoped<WeightedRandomSelector>();
 builder.Services.AddScoped<ChaosEventEngine>();
 builder.Services.AddHostedService<ChaosEventScheduler>();
+
+// Ensure all JSON responses use camelCase property names
+builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+});
 
 var app = builder.Build();
 

@@ -13,6 +13,7 @@ import {
   Package,
   PackageCheck,
   User,
+  Zap,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { useAuth } from "../contexts/AuthContext";
@@ -57,6 +58,11 @@ const navItems = [
         icon: User,
         label: "Piloter",
         href: "/dashboard/pilots",
+      },
+      {
+        icon: Zap,
+        label: "Chaos Engine",
+        href: "/dashboard/admin",
       },
     ],
   },

@@ -121,7 +121,7 @@
           "description": "Create a function that selects an event based on its weighted probability.",
           "dependencies": [],
           "details": "Develop the algorithm in a separate file. Ensure it can handle multiple events and their respective weights.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Unit tests for various weight combinations to ensure correct selection."
         },
         {
@@ -132,7 +132,7 @@
             1
           ],
           "details": "Create a RESTful API endpoint that triggers the event generation. Store events in a database for future reference.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Integration tests with mocking of the weighted random selection function."
         },
         {
@@ -143,7 +143,7 @@
             2
           ],
           "details": "Deploy the service in a development environment. Run end-to-end tests to ensure events are generated as expected.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Automated tests for the entire pipeline, including the service's interaction with the database."
         },
         {
@@ -151,7 +151,7 @@
           "title": "Design Chaos Event Definitions Database Schema",
           "description": "Create a database table (e.g., chaos_event_definitions) to store chaos event types, weights, and descriptions. Update the EF Core model and add a migration.",
           "details": "Define the entity and migration for chaos event definitions. Fields: Id (PK), Name, Weight, Description, and any other relevant metadata. Ensure the schema supports extensibility for future event properties.",
-          "status": "in-progress",
+          "status": "done",
           "dependencies": [],
           "parentTaskId": 3
         },

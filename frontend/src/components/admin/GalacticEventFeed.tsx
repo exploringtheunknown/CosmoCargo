@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { createChaosEventsConnection } from "@/services/signalr";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
+import Link from "next/link";
 
 interface ChaosEvent {
   id: number;
@@ -59,7 +60,17 @@ const GalacticEventFeed: React.FC = () => {
                 </span>
                 <span className="font-medium" aria-label="Description">{ev.eventDescription}</span>
                 <span className="text-xs text-space-text-secondary" aria-label="Impact details">{ev.impactDetails}</span>
-                <span className="text-xs text-space-text-secondary" aria-label="Shipment ID">🚀 {ev.shipmentId}</span>
+                <span className="text-xs text-space-text-secondary flex items-center gap-1" aria-label="Shipment ID">
+                  🚀
+                  <Link
+                    href={`/dashboard/shipments/${ev.shipmentId}`}
+                    title={ev.shipmentId}
+                    className="underline hover:text-space-accent-purple focus-visible:ring-2 focus-visible:ring-space-accent"
+                    aria-label={`Go to shipment ${ev.shipmentId}`}
+                  >
+                    {ev.shipmentId.slice(0, 8) + '...'}
+                  </Link>
+                </span>
               </li>
             ))}
           </ul>

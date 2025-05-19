@@ -67,4 +67,10 @@ export const api = {
     getChaosLogRetention: () => apiRequest<{ days: number }>("/chaos-events/log-retention", { method: 'GET' }),
     setChaosLogRetention: (days: number) => apiRequest<{ days: number }>("/chaos-events/log-retention", { method: 'POST', body: JSON.stringify({ days }) }),
     manualChaosLogCleanup: () => apiRequest<{ message: string }>("/chaos-events/manual-log-cleanup", { method: 'POST', body: '{}' }),
+
+    // Chaos event definitions endpoints
+    getChaosEventDefinitions: () => apiRequest<any[]>("/chaos-events/definitions", { method: 'GET' }),
+    postChaosEventDefinition: (payload: any) => apiRequest<any>("/chaos-events/definitions", { method: 'POST', body: JSON.stringify(payload) }),
+    putChaosEventDefinition: (id: string, payload: any) => apiRequest<any>(`/chaos-events/definitions/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+    deleteChaosEventDefinition: (id: string) => apiRequest<any>(`/chaos-events/definitions/${id}`, { method: 'DELETE' }),
 }; 

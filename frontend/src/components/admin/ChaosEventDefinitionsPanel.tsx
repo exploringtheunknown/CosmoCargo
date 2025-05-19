@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTitle, DialogFooter } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
 import { useToast } from "../ui/use-toast";
+import { api } from "@/services/api";
 
 interface ChaosEventDefinition {
   id: number;
@@ -27,10 +28,9 @@ const ChaosEventDefinitionsPanel: React.FC = () => {
   const fetchDefinitions = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/chaos-events/definitions");
+      const res = await api.getChaosEventDefinitions();
       if (!res.ok) throw new Error("Kunde inte hämta definitioner");
-      const data = await res.json();
-      setDefinitions(data);
+      setDefinitions(res.data);
       setError(null);
     } catch (e: any) {
       setError(e.message);
@@ -79,21 +79,12 @@ const ChaosEventDefinitionsPanel: React.FC = () => {
     try {
       let res;
       if (editDef) {
-        res = await fetch(`/api/chaos-events/definitions/${editDef.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+        res = await api.putChaosEventDefinition(editDef.id.toString(), payload);
       } else {
-        res = await fetch("/api/chaos-events/definitions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+        res = await api.postChaosEventDefinition(payload);
       }
       if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg || "Fel vid sparande");
+        throw new Error(res.data?.message || "Fel vid sparande");
       }
       toast({ title: editDef ? "Uppdaterad!" : "Skapad!" });
       closeDialog();
@@ -106,7 +97,7 @@ const ChaosEventDefinitionsPanel: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!window.confirm("Är du säker på att du vill ta bort denna definition?")) return;
     try {
-      const res = await fetch(`/api/chaos-events/definitions/${id}`, { method: "DELETE" });
+      const res = await api.deleteChaosEventDefinition(id.toString());
       if (!res.ok) throw new Error("Fel vid borttagning");
       toast({ title: "Borttagen!" });
       fetchDefinitions();

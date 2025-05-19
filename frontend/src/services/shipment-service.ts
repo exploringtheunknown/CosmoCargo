@@ -1,5 +1,5 @@
 import { api } from "./api";
-import Shipment, { ShipmentContact } from "../model/shipment";
+import { Shipment, ShipmentContact } from "../types/Shipment";
 import { ShipmentStatus } from "../model/types";
 import { mapBackendStatusToFrontend, mapFrontendStatusToBackend } from "../utils/shipment-status";
 import { PaginatedResult } from "@/model/paginated-result";
@@ -38,7 +38,6 @@ export const getShipments = async (filter?: ShipmentsFilter): Promise<PaginatedR
     
     const response = await api.get<PaginatedResult<Shipment>>(`/shipments?${queryParams.toString()}`);
     
-    // Convert status in each shipment from numeric to string enum
     const convertedItems = response.data.items.map(shipment => ({
         ...shipment,
         status: mapBackendStatusToFrontend(shipment.status as unknown as number)
@@ -51,19 +50,23 @@ export const getShipments = async (filter?: ShipmentsFilter): Promise<PaginatedR
 };
 
 export const getShipmentById = async (id: string): Promise<Shipment> => {
-    const response = await api.get<Shipment>(`/shipments/${id}`);
-    
-    // Convert status from numeric to string enum
-    return {
-        ...response.data,
-        status: mapBackendStatusToFrontend(response.data.status as unknown as number)
-    };
+    try {
+        // Hämta endast fraktinformation utan tulldeklaration
+        const response = await api.get<Shipment>(`/shipments/${id}`);
+        
+        return {
+            ...response.data,
+            status: mapBackendStatusToFrontend(response.data.status as unknown as number)
+        };
+    } catch (error) {
+        console.error("Kunde inte hämta fraktinformation", error);
+        throw error;
+    }
 };
 
 export const createShipment = async (request: CreateShipmentRequest): Promise<Shipment> => {
     const response = await api.post<Shipment>('/shipments', request);
     
-    // Convert status from numeric to string enum
     return {
         ...response.data,
         status: mapBackendStatusToFrontend(response.data.status as unknown as number)
@@ -74,7 +77,6 @@ export const updateShipmentStatus = async (id: string, request: UpdateShipmentSt
     const backendStatus = mapFrontendStatusToBackend(request.status);
     const response = await api.put<Shipment>(`/shipments/${id}/status`, { status: backendStatus });
     
-    // Convert status from numeric to string enum
     return {
         ...response.data,
         status: mapBackendStatusToFrontend(response.data.status as unknown as number)
@@ -84,7 +86,6 @@ export const updateShipmentStatus = async (id: string, request: UpdateShipmentSt
 export const assignPilot = async (id: string, request: AssignPilotRequest): Promise<Shipment> => {
     const response = await api.put<Shipment>(`/shipments/${id}/assign-pilot`, request);
     
-    // Convert status from numeric to string enum
     return {
         ...response.data,
         status: mapBackendStatusToFrontend(response.data.status as unknown as number)

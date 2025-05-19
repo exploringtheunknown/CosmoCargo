@@ -16,12 +16,13 @@ import { getShipments, ShipmentsFilter } from "@/services/shipment-service";
 import { ShipmentStatus } from "@/model/types";
 import { getStatusDisplayText, getStatusColorClass } from "@/utils/shipment-status";
 import Pagination from "@/components/ui/pagination";
-
+import { useRouter } from "next/navigation";
 const OngoingShipments = () => {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<ShipmentStatus | "">("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const router = useRouter();
 
   const { data: shipments, refetch } = useQuery({
     queryKey: ["shipments", search, status, page, pageSize],
@@ -130,8 +131,8 @@ const OngoingShipments = () => {
                     {shipment.sender.station + ' @ ' + shipment.sender.planet} → {shipment.receiver.station + ' @ ' + shipment.receiver.planet}
                   </CardDescription>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
-                  {getStatusDisplayText(shipment.status)}
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status as unknown as ShipmentStatus)}`}>
+                  {getStatusDisplayText(shipment.status as unknown as ShipmentStatus)}
                 </span>
               </div>
             </CardHeader>
@@ -144,7 +145,7 @@ const OngoingShipments = () => {
                 <div className="relative pt-1">
                   <div className="overflow-hidden h-2 text-xs flex rounded bg-space-secondary/50">
                     <div
-                      style={{ width: `${getProgressPercentage(shipment.status)}%` }}
+                      style={{ width: `${getProgressPercentage(shipment.status as unknown as ShipmentStatus)}%` }}
                       className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-space-accent-blue to-space-accent-purple"
                     ></div>
                   </div>
@@ -155,7 +156,7 @@ const OngoingShipments = () => {
                 <div className="text-space-text-secondary text-sm">
                   Last: {shipment.category}
                 </div>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" onClick={() => router.push(`/dashboard/shipments/${shipment.id}`)}>
                   <Eye className="h-4 w-4 mr-2" />
                   Visa detaljer
                 </Button>

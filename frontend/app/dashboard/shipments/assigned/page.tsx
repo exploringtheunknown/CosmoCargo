@@ -91,8 +91,8 @@ const AssignedShipments = () => {
                   <TableCell>{shipment.receiver.station + " @ " + shipment.receiver.planet}</TableCell>
                   <TableCell>{shipment.category}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
-                      {getStatusDisplayText(shipment.status)}
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status as unknown as ShipmentStatus)}`}>
+                      {getStatusDisplayText(shipment.status as unknown as ShipmentStatus)}
                     </span>
                   </TableCell>
                   <TableCell>

@@ -7,8 +7,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
-using CosmoCargo.Utils;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using CosmoCargo.Utils;
+using CosmoCargo.Validation;
+using CosmoCargo.Api;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -101,6 +103,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IPilotService, PilotService>();
+builder.Services.AddScoped<RiskAssessmentService>();
+builder.Services.AddScoped<CustomsDeclarationValidator>();
 
 var app = builder.Build();
 
@@ -121,7 +125,15 @@ using (var scope = app.Services.CreateScope())
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Ett fel uppstod vid initialisering av databasen.");
-        throw;
+                
+        if (ex.ToString().Contains("relation") && ex.ToString().Contains("already exists"))
+        {
+            logger.LogWarning("Tabeller existerar redan. Fortsätter applikationsstart.");
+        }
+        else
+        {
+            throw;
+        }
     }
 }
 
@@ -140,5 +152,6 @@ app.Put("/api/pilots/{id}", PilotEndpoints.UpdatePilot, ["Admin"]);
 app.Post("/api/pilots", PilotEndpoints.CreatePilot, ["Admin"]);
 app.Get("/api/users/me", UserEndpoints.GetMe);
 app.Put("/api/users/me", UserEndpoints.UpdateMe);
+app.MapCustomsDeclarationEndpoints();
 
 app.Run();

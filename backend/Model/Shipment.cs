@@ -23,5 +23,6 @@ namespace CosmoCargo.Model
         // Navigation properties
         public virtual User Customer { get; set; } = null!;
         public virtual User? Pilot { get; set; }
+        public virtual CustomsDeclaration? CustomsDeclaration { get; set; }
     }
 }

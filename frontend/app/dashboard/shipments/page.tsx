@@ -35,15 +35,17 @@ import {
   Plane,
   Loader,
 } from "lucide-react";
-import Shipment from "@/model/shipment";
+import { Shipment } from "@/types/Shipment";
 import { assignPilot, getShipments, ShipmentsFilter, updateShipmentStatus } from "@/services/shipment-service";
 import { ShipmentStatus } from "@/model/types";
 import { useQuery } from "@tanstack/react-query";
 import { getStatusColorClass, getStatusDisplayText } from "@/utils/shipment-status";
 import { getPilots, PilotsFilter } from "@/services/pilot-service";
 import Pagination from "@/components/ui/pagination";
+import { useRouter } from "next/navigation";
 
 const ShipmentManagement = () => {
+  const router = useRouter();
   const { user } = useAuth();
   const [showAssignDialog, setShowAssignDialog] = useState(false);
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
@@ -160,8 +162,8 @@ const ShipmentManagement = () => {
                 <TableCell>{shipment.receiver.station + " @ " + shipment.receiver.planet}</TableCell>
                 <TableCell>{shipment.category}</TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
-                    {getStatusDisplayText(shipment.status)}
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status as unknown as ShipmentStatus)}`}>
+                    {getStatusDisplayText(shipment.status as unknown as ShipmentStatus)}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -210,7 +212,7 @@ const ShipmentManagement = () => {
                         Tilldela Pilot
                       </Button>
                     )}
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/shipments/${shipment.id}`)}>
                       <Package className="h-4 w-4 mr-1" />
                       Detaljer
                     </Button>
@@ -252,7 +254,7 @@ const ShipmentManagement = () => {
                   <SelectValue placeholder="Välj en pilot" />
                 </SelectTrigger>
                 <SelectContent>
-                  {pilots?.items.filter((p) => p.available).map((pilot) => (
+                  {pilots?.items.filter((p) => p.isActive).map((pilot) => (
                     <SelectItem key={pilot.id} value={pilot.id}>
                       {pilot.name}
                     </SelectItem>

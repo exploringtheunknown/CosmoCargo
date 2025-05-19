@@ -23,4 +23,13 @@ export default interface Shipment {
     createdAt: string;
     updatedAt: string;
     pilot?: User | null;
+    customsDeclaration?: CustomsDeclaration | null;
+}
+
+export interface CustomsDeclaration {
+    id: string;
+    shipmentId: string;
+    declaration: string;
+    createdAt: string;
+    updatedAt: string;
 }

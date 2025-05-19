@@ -17,6 +17,7 @@ import { Package, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createShipment } from "@/services/shipment-service";
 import { useRouter } from "next/navigation";
+import CustomsDeclarationForm from "@/components/CustomsDeclarationForm";
 
 const BookShipment = () => {
   const { toast } = useToast();
@@ -49,6 +50,16 @@ const BookShipment = () => {
         priority: formData.get("package-priority") as string,
         description: formData.get("package-description") as string,
         hasInsurance: formData.get("insurance") === "on",
+        customsDeclaration: {
+          containsLifeforms: formData.get("containsLifeforms") === "on",
+          lifeformType: formData.get("lifeformType") as string || undefined,
+          isPlasmaActive: formData.get("isPlasmaActive") === "on",
+          plasmaStabilityLevel: formData.get("plasmaStabilityLevel") ? 
+            parseInt(formData.get("plasmaStabilityLevel") as string) : undefined,
+          quarantineRequired: formData.get("quarantineRequired") === "on",
+          originPlanetLawsConfirmed: formData.get("originPlanetLawsConfirmed") === "on",
+          customsNotes: formData.get("customsNotes") as string || undefined
+        }
       };
 
       await createShipment(shipmentData);
@@ -207,6 +218,8 @@ const BookShipment = () => {
 
             <div className="border-t border-space-secondary/30 pt-6">
               <h3 className="text-lg font-medium mb-4">Paketinformation</h3>
+
+              <CustomsDeclarationForm />
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">

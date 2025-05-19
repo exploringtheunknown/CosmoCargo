@@ -16,12 +16,15 @@ import { getShipments, ShipmentsFilter } from "@/services/shipment-service";
 import { ShipmentStatus } from "@/model/types";
 import { getStatusDisplayText, getStatusColorClass } from "@/utils/shipment-status";
 import Pagination from "@/components/ui/pagination";
+import ShipmentDetailsModal from "@/components/ui/ShipmentDetailsModal";
 
 const OngoingShipments = () => {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<ShipmentStatus | "">("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailsShipment, setDetailsShipment] = useState<any>(null);
 
   const { data: shipments, refetch } = useQuery({
     queryKey: ["shipments", search, status, page, pageSize],
@@ -155,7 +158,7 @@ const OngoingShipments = () => {
                 <div className="text-space-text-secondary text-sm">
                   Last: {shipment.category}
                 </div>
-                <Button size="sm" variant="outline">
+                <Button size="sm" variant="outline" onClick={() => { setDetailsShipment(shipment); setShowDetailsModal(true); }}>
                   <Eye className="h-4 w-4 mr-2" />
                   Visa detaljer
                 </Button>
@@ -174,6 +177,12 @@ const OngoingShipments = () => {
           onPageChange={setPage}
         />
       )}
+
+      <ShipmentDetailsModal
+        open={showDetailsModal}
+        onClose={() => { setShowDetailsModal(false); setDetailsShipment(null); }}
+        shipment={detailsShipment || undefined}
+      />
     </div>
   );
 };

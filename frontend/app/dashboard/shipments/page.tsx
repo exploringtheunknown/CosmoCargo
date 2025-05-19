@@ -44,6 +44,7 @@ import { getStatusColorClass, getStatusDisplayText } from "@/utils/shipment-stat
 import { getPilots, PilotsFilter } from "@/services/pilot-service";
 import Pagination from "@/components/ui/pagination";
 import { api } from "@/services/api";
+import ShipmentDetailsModal from "@/components/ui/ShipmentDetailsModal";
 
 const ShipmentManagement = () => {
   const { user } = useAuth();
@@ -55,6 +56,8 @@ const ShipmentManagement = () => {
   const [chaosLoading, setChaosLoading] = useState(false);
   const [chaosError, setChaosError] = useState<string | null>(null);
   const [chaosSuccess, setChaosSuccess] = useState<string | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailsShipment, setDetailsShipment] = useState<Shipment | null>(null);
   
   const { data: shipments, refetch, isLoading: shipmentsLoading } = useQuery({
     queryKey: ["shipments", page],
@@ -244,7 +247,7 @@ const ShipmentManagement = () => {
                       <Zap className="h-4 w-4 mr-1" />
                       Trigger Chaos
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" onClick={() => { setDetailsShipment(shipment); setShowDetailsModal(true); }}>
                       <Package className="h-4 w-4 mr-1" />
                       Detaljer
                     </Button>
@@ -331,6 +334,12 @@ const ShipmentManagement = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ShipmentDetailsModal
+        open={showDetailsModal}
+        onClose={() => { setShowDetailsModal(false); setDetailsShipment(null); }}
+        shipment={detailsShipment || undefined}
+      />
     </div>
   );
 };

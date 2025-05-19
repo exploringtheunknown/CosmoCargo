@@ -4,6 +4,7 @@ import { createChaosEventsConnection } from "@/services/signalr";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import Link from "next/link";
+import ShipmentDetailsModal from "@/components/ui/ShipmentDetailsModal";
 
 interface ChaosEvent {
   id: number;
@@ -17,6 +18,8 @@ interface ChaosEvent {
 const GalacticEventFeed: React.FC = () => {
   const [events, setEvents] = useState<ChaosEvent[]>([]);
   const connectionRef = useRef<any>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailsShipmentId, setDetailsShipmentId] = useState<string | null>(null);
 
   useEffect(() => {
     connectionRef.current = createChaosEventsConnection((event: ChaosEvent) => {
@@ -67,6 +70,11 @@ const GalacticEventFeed: React.FC = () => {
                     title={ev.shipmentId}
                     className="underline hover:text-space-accent-purple focus-visible:ring-2 focus-visible:ring-space-accent"
                     aria-label={`Go to shipment ${ev.shipmentId}`}
+                    onClick={e => {
+                      e.preventDefault();
+                      setDetailsShipmentId(ev.shipmentId);
+                      setShowDetailsModal(true);
+                    }}
                   >
                     {ev.shipmentId.slice(0, 8) + '...'}
                   </Link>
@@ -75,6 +83,11 @@ const GalacticEventFeed: React.FC = () => {
             ))}
           </ul>
         )}
+        <ShipmentDetailsModal
+          open={showDetailsModal}
+          onClose={() => { setShowDetailsModal(false); setDetailsShipmentId(null); }}
+          shipmentId={detailsShipmentId || undefined}
+        />
       </CardContent>
     </Card>
   );

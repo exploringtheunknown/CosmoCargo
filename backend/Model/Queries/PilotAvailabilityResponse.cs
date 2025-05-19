@@ -1,9 +1,8 @@
-namespace CosmoCargo.Model.Queries
+namespace CosmoCargo.Model.Queries;
+
+public class PilotAvailabilityResponse
 {
-    public class PilotAvailabilityResponse
-    {
-        public bool IsAvailable { get; set; }
-        public int ActiveShipments { get; set; }
-        public int MaxShipments { get; set; }
-    }
+    public bool IsAvailable { get; set; }
+    public int ActiveShipments { get; set; }
+    public int MaxShipments { get; set; }
 }

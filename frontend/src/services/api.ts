@@ -62,4 +62,9 @@ export const api = {
         }),
     delete: <T>(endpoint: string) => 
         apiRequest<T>(endpoint, { method: 'DELETE' }),
+
+    // Chaos log retention endpoints
+    getChaosLogRetention: () => apiRequest<{ days: number }>("/chaos-events/log-retention", { method: 'GET' }),
+    setChaosLogRetention: (days: number) => apiRequest<{ days: number }>("/chaos-events/log-retention", { method: 'POST', body: JSON.stringify({ days }) }),
+    manualChaosLogCleanup: () => apiRequest<{ message: string }>("/chaos-events/manual-log-cleanup", { method: 'POST', body: '{}' }),
 }; 

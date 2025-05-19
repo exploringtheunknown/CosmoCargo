@@ -1,142 +1,143 @@
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using CosmoCargo.Model;
 using CosmoCargo.Model.Queries;
 using CosmoCargo.Services;
 using CosmoCargo.Utils;
-using System.Security.Claims;
-using System.ComponentModel.DataAnnotations;
 
-namespace CosmoCargo.Endpoints
+namespace CosmoCargo.Endpoints;
+
+public static class PilotEndpoints
 {
-    public static class PilotEndpoints
+    public static async Task<IResult> GetPilots(
+        [AsParameters] PilotsFilter filter,
+        IPilotService pilotService,
+        ClaimsPrincipal user)
     {
-        public static async Task<IResult> GetPilots(
-            [AsParameters] PilotsFilter filter,
-            IPilotService pilotService,
-            ClaimsPrincipal user)
-        {
-            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
-            if (forbidden != null)
-                return forbidden;
-            if (role != UserRole.Admin)
-                return Results.Forbid();
+        var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+        if (forbidden != null)
+            return forbidden;
+        if (role != UserRole.Admin)
+            return Results.Forbid();
 
-            var pilots = await pilotService.GetAllPilotsAsync(filter);
-            return Results.Ok(pilots);
-        }
-
-        public static async Task<IResult> GetPilotById(
-            Guid id,
-            IPilotService pilotService,
-            ClaimsPrincipal user)
-        {
-            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
-            if (forbidden != null)
-                return forbidden;
-            if (role != UserRole.Admin)
-                return Results.Forbid();
-
-            var pilot = await pilotService.GetPilotByIdAsync(id);
-            if (pilot == null)
-                return Results.NotFound();
-
-            return Results.Ok(pilot);
-        }
-
-        public static async Task<IResult> GetPilotAvailability(
-            Guid id,
-            IPilotService pilotService,
-            ClaimsPrincipal user)
-        {
-            var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
-            if (forbidden != null)
-                return forbidden;
-            if (role != UserRole.Admin)
-                return Results.Forbid();
-
-            var pilot = await pilotService.GetPilotByIdAsync(id);
-            if (pilot == null)
-                return Results.NotFound();
-
-            var isAvailable = await pilotService.IsPilotAvailableAsync(id);
-            var activeShipments = await pilotService.GetPilotShipmentCountAsync(id);
-            
-            return Results.Ok(new PilotAvailabilityResponse
-            {
-                IsAvailable = isAvailable,
-                ActiveShipments = activeShipments,
-                MaxShipments = 3
-            });
-        }
-
-        public static async Task<IResult> UpdatePilotStatus(
-            Guid id,
-            UpdatePilotStatusRequest request,
-            IPilotService pilotService)
-        {
-            await pilotService.UpdatePilotStatusAsync(id, request.IsActive);
-            return Results.Ok();
-        }
-
-        public static async Task<IResult> UpdatePilot(
-            Guid id,
-            UpdatePilotRequest request,
-            IPilotService pilotService)
-        {
-            await pilotService.UpdatePilotAsync(id, request.Name, request.Email, request.Experience);
-            return Results.Ok();
-        }
-
-        public static async Task<IResult> CreatePilot(
-            CreatePilotRequest request,
-            IPilotService pilotService)
-        {
-            var id = await pilotService.CreatePilotAsync(request.Name, request.Email, request.Experience);
-            return Results.Ok(id);
-        }
-
-        public static RouteGroupBuilder MapPilotEndpoints(this IEndpointRouteBuilder app)
-        {
-            var group = app.MapGroup("/api/pilots");
-            group.MapGet("/", GetPilots).RequireAuthorization("Admin");
-            group.MapGet("/{id}", GetPilotById).RequireAuthorization("Admin");
-            group.MapGet("/{id}/availability", GetPilotAvailability).RequireAuthorization("Admin");
-            group.MapPut("/{id}/status", UpdatePilotStatus).RequireAuthorization("Admin");
-            group.MapPut("/{id}", UpdatePilot).RequireAuthorization("Admin");
-            group.MapPost("/", CreatePilot).RequireAuthorization("Admin");
-            return group;
-        }
+        var pilots = await pilotService.GetAllPilotsAsync(filter);
+        return Results.Ok(pilots);
     }
 
-    public class UpdatePilotStatusRequest
+    public static async Task<IResult> GetPilotById(
+        Guid id,
+        IPilotService pilotService,
+        ClaimsPrincipal user)
     {
-        public bool IsActive { get; set; }
+        var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+        if (forbidden != null)
+            return forbidden;
+        if (role != UserRole.Admin)
+            return Results.Forbid();
+
+        var pilot = await pilotService.GetPilotByIdAsync(id);
+        if (pilot == null)
+            return Results.NotFound();
+
+        return Results.Ok(pilot);
     }
 
-    public class UpdatePilotRequest
+    public static async Task<IResult> GetPilotAvailability(
+        Guid id,
+        IPilotService pilotService,
+        ClaimsPrincipal user)
     {
-        [Required]
-        [MinLength(3)]
-        [MaxLength(100)]
-        public string Name { get; set; } = string.Empty;
-        [Required]
-        [EmailAddress]
-        [MaxLength(100)]
-        public string Email { get; set; } = string.Empty;
-        [MaxLength(500)]
-        public string? Experience { get; set; }
+        var forbidden = EndpointHelpers.TryGetUserRoleOrForbid(user, out var role);
+        if (forbidden != null)
+            return forbidden;
+        if (role != UserRole.Admin)
+            return Results.Forbid();
+
+        var pilot = await pilotService.GetPilotByIdAsync(id);
+        if (pilot == null)
+            return Results.NotFound();
+
+        var isAvailable = await pilotService.IsPilotAvailableAsync(id);
+        var activeShipments = await pilotService.GetPilotShipmentCountAsync(id);
+
+        return Results.Ok(new PilotAvailabilityResponse
+        {
+            IsAvailable = isAvailable,
+            ActiveShipments = activeShipments,
+            MaxShipments = 3
+        });
     }
 
-    public class CreatePilotRequest
+    public static async Task<IResult> UpdatePilotStatus(
+        Guid id,
+        UpdatePilotStatusRequest request,
+        IPilotService pilotService)
     {
-        [Required]
-        [MinLength(3)]
-        [MaxLength(100)]
-        public string Name { get; set; } = string.Empty;
-        [Required]
-        [EmailAddress]
-        [MaxLength(100)]
-        public string Email { get; set; } = string.Empty;
-        [MaxLength(500)]
-        public string? Experience { get; set; }
+        await pilotService.UpdatePilotStatusAsync(id, request.IsActive);
+        return Results.Ok();
     }
-} 
+
+    public static async Task<IResult> UpdatePilot(
+        Guid id,
+        UpdatePilotRequest request,
+        IPilotService pilotService)
+    {
+        await pilotService.UpdatePilotAsync(id, request.Name, request.Email, request.Experience);
+        return Results.Ok();
+    }
+
+    public static async Task<IResult> CreatePilot(
+        CreatePilotRequest request,
+        IPilotService pilotService)
+    {
+        var id = await pilotService.CreatePilotAsync(request.Name, request.Email, request.Experience);
+        return Results.Ok(id);
+    }
+
+    public static RouteGroupBuilder MapPilotEndpoints(this IEndpointRouteBuilder app)
+    {
+        var group = app.MapGroup("/api/pilots");
+        group.MapGet("/", GetPilots).RequireAuthorization("Admin");
+        group.MapGet("/{id}", GetPilotById).RequireAuthorization("Admin");
+        group.MapGet("/{id}/availability", GetPilotAvailability).RequireAuthorization("Admin");
+        group.MapPut("/{id}/status", UpdatePilotStatus).RequireAuthorization("Admin");
+        group.MapPut("/{id}", UpdatePilot).RequireAuthorization("Admin");
+        group.MapPost("/", CreatePilot).RequireAuthorization("Admin");
+        return group;
+    }
+}
+
+public class UpdatePilotStatusRequest
+{
+    public bool IsActive { get; set; }
+}
+
+public class UpdatePilotRequest
+{
+    [Required]
+    [MinLength(3)]
+    [MaxLength(100)]
+    public string Name { get; set; } = string.Empty;
+
+    [Required]
+    [EmailAddress]
+    [MaxLength(100)]
+    public string Email { get; set; } = string.Empty;
+
+    [MaxLength(500)] public string? Experience { get; set; }
+}
+
+public class CreatePilotRequest
+{
+    [Required]
+    [MinLength(3)]
+    [MaxLength(100)]
+    public string Name { get; set; } = string.Empty;
+
+    [Required]
+    [EmailAddress]
+    [MaxLength(100)]
+    public string Email { get; set; } = string.Empty;
+
+    [MaxLength(500)] public string? Experience { get; set; }
+}

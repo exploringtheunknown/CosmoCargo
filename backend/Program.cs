@@ -1,14 +1,16 @@
-using CosmoCargo.Data;
-using CosmoCargo.Services;
-using CosmoCargo.Endpoints;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.OpenApi.Models;
-using Scalar.AspNetCore;
+using System.Text.Json;
+using CosmoCargo.Data;
+using CosmoCargo.Endpoints;
+using CosmoCargo.Services;
 using CosmoCargo.Utils;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,9 +60,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -81,7 +83,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "defaultDevKeyThatShouldBeReplaced"))
+            IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ??
+                                                                "defaultDevKeyThatShouldBeReplaced"))
         };
     });
 
@@ -109,12 +113,13 @@ builder.Services.AddScoped<IPilotService, PilotService>();
 builder.Services.AddScoped<WeightedRandomSelector>();
 builder.Services.AddScoped<ChaosEventEngine>();
 builder.Services.AddHostedService<ChaosEventScheduler>();
+builder.Services.AddScoped<AppSettingsService>();
 builder.Services.AddSignalR();
 
 // Ensure all JSON responses use camelCase property names
-builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =>
+builder.Services.Configure<JsonOptions>(options =>
 {
-    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
 var app = builder.Build();
@@ -130,11 +135,11 @@ await app.MigrateAndSeedDatabaseAsync();
 // Register endpoint groups
 app.MapHealthcheckEndpoints();
 app.MapAuthEndpoints();
-app.MapShipmentEndpoints().AddEndpointFilter<CosmoCargo.Utils.ValidationFilter>();
-app.MapPilotEndpoints().AddEndpointFilter<CosmoCargo.Utils.ValidationFilter>();
-app.MapUserEndpoints().AddEndpointFilter<CosmoCargo.Utils.ValidationFilter>();
-app.MapChaosEventEndpoints().AddEndpointFilter<CosmoCargo.Utils.ValidationFilter>();
-app.MapHub<CosmoCargo.Services.ChaosEventsHub>("/hubs/chaos-events").RequireAuthorization("Admin");
+app.MapShipmentEndpoints().AddEndpointFilter<ValidationFilter>();
+app.MapPilotEndpoints().AddEndpointFilter<ValidationFilter>();
+app.MapUserEndpoints().AddEndpointFilter<ValidationFilter>();
+app.MapChaosEventEndpoints().AddEndpointFilter<ValidationFilter>();
+app.MapHub<ChaosEventsHub>("/hubs/chaos-events").RequireAuthorization("Admin");
 
 if (app.Environment.IsDevelopment())
 {

@@ -1,108 +1,116 @@
 using CosmoCargo.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace CosmoCargo.Data
+namespace CosmoCargo.Data;
+
+public class AppDbContext : DbContext
 {
-    public class AppDbContext : DbContext
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    }
+
+    public DbSet<User> Users { get; set; }
+    public DbSet<Shipment> Shipments { get; set; }
+    public DbSet<ChaosEventLog> ChaosEventLogs { get; set; }
+    public DbSet<ChaosEventDefinition> ChaosEventDefinitions { get; set; }
+    public DbSet<AppSetting> AppSettings { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplySnakeCaseNamingConvention();
+
+        modelBuilder.Entity<User>(entity =>
         {
-        }
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Email).IsRequired();
+            entity.Property(e => e.PasswordHash).IsRequired();
+            entity.Property(e => e.Name).IsRequired();
+            entity.Property(e => e.Role).IsRequired();
+            entity.Property(e => e.Experience);
+            entity.Property(e => e.IsActive);
+            entity.HasIndex(e => e.Email).IsUnique();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<Shipment> Shipments { get; set; }
-        public DbSet<ChaosEventLog> ChaosEventLogs { get; set; }
-        public DbSet<ChaosEventDefinition> ChaosEventDefinitions { get; set; }
+            entity.HasMany(u => u.CustomerShipments)
+                .WithOne(s => s.Customer)
+                .HasForeignKey(s => s.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+            entity.HasMany(u => u.PilotShipments)
+                .WithOne(s => s.Pilot)
+                .HasForeignKey(s => s.PilotId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Shipment>(entity =>
         {
-            base.OnModelCreating(modelBuilder);
+            entity.ToTable("shipments");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
-            modelBuilder.ApplySnakeCaseNamingConvention();
-
-            modelBuilder.Entity<User>(entity =>
+            entity.ComplexProperty(e => e.Sender, sender =>
             {
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-                entity.Property(e => e.Email).IsRequired();
-                entity.Property(e => e.PasswordHash).IsRequired();
-                entity.Property(e => e.Name).IsRequired();
-                entity.Property(e => e.Role).IsRequired();
-                entity.Property(e => e.Experience);
-                entity.Property(e => e.IsActive);
-                entity.HasIndex(e => e.Email).IsUnique();
-                entity.Property(e => e.CreatedAt).IsRequired();
-                entity.Property(e => e.UpdatedAt).IsRequired();
-
-                entity.HasMany(u => u.CustomerShipments)
-                    .WithOne(s => s.Customer)
-                    .HasForeignKey(s => s.CustomerId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasMany(u => u.PilotShipments)
-                    .WithOne(s => s.Pilot)
-                    .HasForeignKey(s => s.PilotId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                sender.Property(s => s.Name).IsRequired().HasColumnName("sender_name");
+                sender.Property(s => s.Email).IsRequired().HasColumnName("sender_email");
+                sender.Property(s => s.Planet).IsRequired().HasColumnName("sender_planet");
+                sender.Property(s => s.Station).IsRequired().HasColumnName("sender_station");
             });
 
-            modelBuilder.Entity<Shipment>(entity =>
+            entity.ComplexProperty(e => e.Receiver, receiver =>
             {
-                entity.ToTable("shipments");
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-                
-                entity.ComplexProperty(e => e.Sender, sender =>
-                {
-                    sender.Property(s => s.Name).IsRequired().HasColumnName("sender_name");
-                    sender.Property(s => s.Email).IsRequired().HasColumnName("sender_email");
-                    sender.Property(s => s.Planet).IsRequired().HasColumnName("sender_planet");
-                    sender.Property(s => s.Station).IsRequired().HasColumnName("sender_station");
-                });
-                
-                entity.ComplexProperty(e => e.Receiver, receiver =>
-                {
-                    receiver.Property(r => r.Name).IsRequired().HasColumnName("receiver_name");
-                    receiver.Property(r => r.Email).IsRequired().HasColumnName("receiver_email");
-                    receiver.Property(r => r.Planet).IsRequired().HasColumnName("receiver_planet");
-                    receiver.Property(r => r.Station).IsRequired().HasColumnName("receiver_station");
-                });
-                
-                // Package information
-                entity.Property(e => e.Weight).IsRequired();
-                entity.Property(e => e.Category).IsRequired();
-                entity.Property(e => e.Priority).IsRequired();
-                entity.Property(e => e.Description);
-                entity.Property(e => e.HasInsurance).IsRequired();
-                
-                // Status and tracking
-                entity.Property(e => e.Status).IsRequired();
-                entity.Property(e => e.CreatedAt).IsRequired();
-                entity.Property(e => e.UpdatedAt).IsRequired();
+                receiver.Property(r => r.Name).IsRequired().HasColumnName("receiver_name");
+                receiver.Property(r => r.Email).IsRequired().HasColumnName("receiver_email");
+                receiver.Property(r => r.Planet).IsRequired().HasColumnName("receiver_planet");
+                receiver.Property(r => r.Station).IsRequired().HasColumnName("receiver_station");
             });
 
-            modelBuilder.Entity<ChaosEventLog>(entity =>
-            {
-                entity.ToTable("chaos_event_logs");
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-                entity.Property(e => e.Timestamp).IsRequired();
-                entity.Property(e => e.ShipmentId).IsRequired();
-                entity.Property(e => e.EventType).IsRequired().HasMaxLength(100);
-                entity.Property(e => e.EventDescription).HasMaxLength(500);
-                entity.Property(e => e.ImpactDetails).HasMaxLength(2000);
-                // Indexes and relationships can be added in a later subtask
-            });
+            // Package information
+            entity.Property(e => e.Weight).IsRequired();
+            entity.Property(e => e.Category).IsRequired();
+            entity.Property(e => e.Priority).IsRequired();
+            entity.Property(e => e.Description);
+            entity.Property(e => e.HasInsurance).IsRequired();
 
-            modelBuilder.Entity<ChaosEventDefinition>(entity =>
-            {
-                entity.ToTable("chaos_event_definitions");
-                entity.HasKey(e => e.Id);
-                entity.Property(e => e.Id).ValueGeneratedOnAdd();
-                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-                entity.HasIndex(e => e.Name).IsUnique();
-                entity.Property(e => e.Weight).IsRequired();
-                entity.Property(e => e.Description).HasMaxLength(500);
-            });
-        }
+            // Status and tracking
+            entity.Property(e => e.Status).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.UpdatedAt).IsRequired();
+        });
+
+        modelBuilder.Entity<ChaosEventLog>(entity =>
+        {
+            entity.ToTable("chaos_event_logs");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Timestamp).IsRequired();
+            entity.Property(e => e.ShipmentId).IsRequired();
+            entity.Property(e => e.EventType).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.EventDescription).HasMaxLength(500);
+            entity.Property(e => e.ImpactDetails).HasMaxLength(2000);
+            // Indexes and relationships can be added in a later subtask
+        });
+
+        modelBuilder.Entity<ChaosEventDefinition>(entity =>
+        {
+            entity.ToTable("chaos_event_definitions");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).ValueGeneratedOnAdd();
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.HasIndex(e => e.Name).IsUnique();
+            entity.Property(e => e.Weight).IsRequired();
+            entity.Property(e => e.Description).HasMaxLength(500);
+        });
+
+        modelBuilder.Entity<AppSetting>(entity =>
+        {
+            entity.ToTable("app_settings");
+            entity.HasKey(e => e.Key);
+            entity.Property(e => e.Key).IsRequired();
+            entity.Property(e => e.Value).IsRequired();
+        });
     }
 }

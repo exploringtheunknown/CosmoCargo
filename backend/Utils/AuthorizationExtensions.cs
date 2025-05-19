@@ -1,18 +1,15 @@
-using Microsoft.Extensions.DependencyInjection;
+namespace CosmoCargo.Utils;
 
-namespace CosmoCargo.Utils
+public static class AuthorizationExtensions
 {
-    public static class AuthorizationExtensions
+    public static IServiceCollection AddCosmoCargoAuthorization(this IServiceCollection services)
     {
-        public static IServiceCollection AddCosmoCargoAuthorization(this IServiceCollection services)
+        services.AddAuthorization(options =>
         {
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
-                options.AddPolicy("Pilot", policy => policy.RequireRole("Pilot"));
-                options.AddPolicy("Customer", policy => policy.RequireRole("Customer"));
-            });
-            return services;
-        }
+            options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+            options.AddPolicy("Pilot", policy => policy.RequireRole("Pilot"));
+            options.AddPolicy("Customer", policy => policy.RequireRole("Customer"));
+        });
+        return services;
     }
-} 
+}

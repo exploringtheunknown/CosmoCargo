@@ -1,6 +1,8 @@
 import { HubConnectionBuilder, LogLevel, HubConnection } from "@microsoft/signalr";
 
-const HUB_URL = process.env.NEXT_PUBLIC_SIGNALR_HUB_URL || "/hubs/chaos-events";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
+const DEFAULT_HUB_URL = API_BASE_URL.replace(/\/api$/, "") + "/hubs/chaos-events";
+const HUB_URL = process.env.NEXT_PUBLIC_SIGNALR_HUB_URL || DEFAULT_HUB_URL;
 
 export function createChaosEventsConnection(onEvent: (event: any) => void): HubConnection {
   const connection = new HubConnectionBuilder()

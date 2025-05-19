@@ -8,6 +8,7 @@ import ChaosEventLogsCard from "@/components/admin/ChaosEventLogsCard";
 import ManualChaosTriggerCard from "@/components/admin/ManualChaosTriggerCard";
 import ChaosEventDefinitionsPanel from "@/components/admin/ChaosEventDefinitionsPanel";
 import GalacticEventFeed from "@/components/admin/GalacticEventFeed";
+import ChaosLogRetentionCard from "@/components/admin/ChaosLogRetentionCard";
 
 const AdminDashboardPage = () => {
   const { user } = useAuth();
@@ -31,12 +32,19 @@ const AdminDashboardPage = () => {
   }
 
   return (
-    <div className="container mx-auto py-8 grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      <EngineStatusCard />
-      <ChaosEventDefinitionsPanel />
-      <ChaosEventLogsCard />
-      <ManualChaosTriggerCard />
-      <GalacticEventFeed />
+    <div className="container mx-auto py-8 grid gap-8 grid-cols-1 lg:grid-cols-2">
+      {/* Left column: widgets stacked */}
+      <div className="flex flex-col gap-6">
+        <EngineStatusCard />
+        <ChaosLogRetentionCard />
+        <ManualChaosTriggerCard />
+        <ChaosEventDefinitionsPanel />
+        <GalacticEventFeed />
+      </div>
+      {/* Right column: logs */}
+      <div>
+        <ChaosEventLogsCard />
+      </div>
     </div>
   );
 };

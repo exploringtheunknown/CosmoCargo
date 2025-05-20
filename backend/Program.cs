@@ -1,14 +1,16 @@
-using CosmoCargo.Data;
-using CosmoCargo.Services;
-using CosmoCargo.Endpoints;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.OpenApi.Models;
-using Scalar.AspNetCore;
+using System.Text.Json;
+using CosmoCargo.Data;
+using CosmoCargo.Endpoints;
+using CosmoCargo.Services;
 using CosmoCargo.Utils;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,19 +50,19 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "Bearer"
                 }
             },
-            Array.Empty<string>()
+            []
         }
     });
 });
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowLocalFrontend", policy =>
     {
-        policy.WithOrigins(["http://localhost:3000", "http://localhost:3001"])
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
@@ -81,7 +83,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "defaultDevKeyThatShouldBeReplaced"))
+            IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ??
+                                                                "defaultDevKeyThatShouldBeReplaced"))
         };
     });
 
@@ -94,51 +98,63 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
+        options.Events.OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddCosmoCargoAuthorization();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShipmentService, ShipmentService>();
 builder.Services.AddScoped<IPilotService, PilotService>();
+builder.Services.AddScoped<WeightedRandomSelector>();
+builder.Services.AddScoped<ChaosEventEngine>();
+builder.Services.AddHostedService<ChaosEventScheduler>();
+builder.Services.AddScoped<AppSettingsService>();
+builder.Services.AddSignalR();
+
+// Ensure all JSON responses use camelCase property names
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
 
 var app = builder.Build();
 
 app.MapOpenApi();
 app.MapScalarApiReference();
-app.UseCors();
+app.UseCors("AllowLocalFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
-using (var scope = app.Services.CreateScope())
+await app.MigrateAndSeedDatabaseAsync();
+
+// Register endpoint groups
+app.MapHealthcheckEndpoints();
+app.MapAuthEndpoints();
+app.MapShipmentEndpoints().AddEndpointFilter<ValidationFilter>();
+app.MapPilotEndpoints().AddEndpointFilter<ValidationFilter>();
+app.MapUserEndpoints().AddEndpointFilter<ValidationFilter>();
+app.MapChaosEventEndpoints().AddEndpointFilter<ValidationFilter>();
+app.MapHub<ChaosEventsHub>("/hubs/chaos-events").RequireAuthorization("Admin");
+
+if (app.Environment.IsDevelopment())
 {
-    var services = scope.ServiceProvider;
-    try
-    {
-        await DbInitializer.InitializeAsync(services);
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "Ett fel uppstod vid initialisering av databasen.");
-        throw;
-    }
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.GetAnonymous("/api/healthcheck/ping", HealthcheckEndpoints.Ping);
-app.PostAnonymous("/api/auth/login", AuthEndpoints.Login);
-app.Get("/api/shipments", ShipmentEndpoints.GetShipments);
-app.Get("/api/shipments/{id}", ShipmentEndpoints.GetShipmentById);
-app.Post("/api/shipments", ShipmentEndpoints.CreateShipment, ["Customer"]);
-app.Put("/api/shipments/{id}/status", ShipmentEndpoints.UpdateShipmentStatus, ["Pilot", "Admin"]);
-app.Put("/api/shipments/{id}/assign", ShipmentEndpoints.AssignPilot, ["Admin"]);
-app.Get("/api/pilots", PilotEndpoints.GetPilots, ["Admin"]);
-app.Get("/api/pilots/{id}", PilotEndpoints.GetPilotById, ["Admin"]);
-app.Get("/api/pilots/{id}/availability", PilotEndpoints.GetPilotAvailability, ["Admin"]);
-app.Put("/api/pilots/{id}/status", PilotEndpoints.UpdatePilotStatus, ["Admin"]);
-app.Put("/api/pilots/{id}", PilotEndpoints.UpdatePilot, ["Admin"]);
-app.Post("/api/pilots", PilotEndpoints.CreatePilot, ["Admin"]);
-app.Get("/api/users/me", UserEndpoints.GetMe);
-app.Put("/api/users/me", UserEndpoints.UpdateMe);
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsync("{\"error\":\"An unexpected error occurred.\"}");
+    });
+});
 
 app.Run();

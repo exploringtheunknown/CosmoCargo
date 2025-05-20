@@ -23,6 +23,21 @@
 ### Infrastruktur
 - Docker
 
+## 📦 ChaosEventLog Schema & Migration
+
+### Table Structure
+
+| Field            | Type      | Description                                              |
+|------------------|-----------|----------------------------------------------------------|
+| Id               | int       | Primary key, unique identifier for each log entry        |
+| Timestamp        | DateTime  | When the chaos event occurred                            |
+| ShipmentId       | Guid      | Foreign key to the affected shipment                     |
+| EventType        | string    | Type of chaos event (e.g., "AsteroidStrike")            |
+| EventDescription | string?   | Human-readable description of the event                  |
+| ImpactDetails    | string?   | Details about the impact (could be JSON or text)         |
+
+> The `ChaosEventLog` entity is defined in `backend/Model/ChaosEventLog.cs` and is managed by EF Core in the `AppDbContext`.
+
 ## 🚀 Utveckling
 
 ### Förutsättningar
@@ -32,7 +47,7 @@
 
 ### Kör lokalt
 
-1. Starta hela systemet med Docker:
+1. Säkerställ att Docker är startat och starta sedan  hela systemet med Docker:
 ```bash
 docker compose up --detach --build
 ```
@@ -130,7 +145,7 @@ I rymden kan allt gå fel. Ta rollen som Master of the Universe och bygg en Inte
 ### Funktionalitet / Krav
 - Var X:e sekund muteras en slumpmässig frakt baserat på en kaoshändelse
 - Ta hänsyn till sannorlikheter
-- Visa dessa i ett “Galactic Event Feed” för admins med tidsstämpel och påverkan (frontend), alternativt endast loggning (backend)
+- Visa dessa i ett "Galactic Event Feed" för admins med tidsstämpel och påverkan (frontend), alternativt endast loggning (backend)
 
 ### Förslag på händelser
 
@@ -139,8 +154,8 @@ I rymden kan allt gå fel. Ta rollen som Master of the Universe och bygg en Inte
 | Meteorstorm | Försening |
 | Maskhål | Destination omdirigeras |
 | Piratattack | Vikt ändras till 0 |
-| Virus i biosensor | Livsformflagga ändras till “Instabil” |
-| Svart hål nära rutten | Status ändras till “Försvunnen i svart hål”  |
+| Virus i biosensor | Livsformflagga ändras till "Instabil" |
+| Svart hål nära rutten | Status ändras till "Försvunnen i svart hål"  |
 | AI gör uppror | Pilot och destination ändras till "Okänd"  |
 
 ### Sannorlikhet

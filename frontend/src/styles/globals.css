@@ -1,0 +1,19 @@
+.galactic-glow {
+  box-shadow: 0 0 24px 8px rgba(80, 0, 255, 0.25), 0 0 64px 16px rgba(0, 200, 255, 0.12);
+  background: radial-gradient(ellipse at 60% 40%, #1a1a40 60%, #2d1b4c 100%);
+}
+.galactic-row-glow {
+  box-shadow: 0 0 8px 2px rgba(80, 0, 255, 0.15), 0 0 16px 4px rgba(0, 200, 255, 0.08);
+}
+.galactic-badge-glow {
+  box-shadow: 0 0 8px 2px #7f5fff, 0 0 16px 4px #00eaff;
+  background: linear-gradient(90deg, #7f5fff 0%, #00eaff 100%);
+  color: #fff !important;
+}
+.animate-spin-slow {
+  animation: spin 4s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+} 

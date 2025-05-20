@@ -1,9 +1,8 @@
-namespace CosmoCargo.Model
+namespace CosmoCargo.Model;
+
+public enum UserRole
 {
-    public enum UserRole
-    {
-        Customer,
-        Pilot,
-        Admin
-    }
+    Customer,
+    Pilot,
+    Admin
 }

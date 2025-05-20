@@ -1,0 +1,38 @@
+# Intergalactic Chaos Engine™ PRD
+
+## Overview
+Build a Chaos Engine for the CosmoCargo platform that periodically mutates shipments with random galactic events, logs the impact, and provides real-time updates to the admin frontend.
+
+## Requirements
+- Every X seconds, a random shipment is mutated by a chaos event.
+- Events are chosen using weighted probabilities, influenced by shipment category.
+- Each event mutates the shipment in the database and logs the impact.
+- All events are persisted in a ChaosEventLog table for audit and frontend display.
+- Admin frontend receives real-time updates via SignalR (Galactic Event Feed).
+- Admins can enable/disable the chaos engine via UI/API.
+- All chaos engine controls and logs are admin-only.
+- Configuration (interval, probabilities) is adjustable.
+
+## Example Chaos Events
+- Meteor Shower: Causes a delay
+- Wormhole: Redirects destination
+- Pirate Attack: Weight set to 0
+- Virus in Biosensor: Lifeform flag set to "Unstable"
+- Black Hole Nearby: Status set to "Lost in Black Hole"
+- AI Uprising: Pilot and destination set to "Unknown"
+
+## Components
+1. Data model & migration for ChaosEventLog
+2. Chaos event engine (event definitions, probability mapping, mutation logic)
+3. BackgroundService scheduler
+4. SignalR hub for real-time updates
+5. API endpoints for event log and admin control
+6. Admin control UI/logic (frontend)
+7. Configuration (interval, probabilities)
+8. Security (admin-only access)
+9. Tests for each component
+
+## Non-Functional
+- Extensible for new events and categories
+- Secure (admin-only)
+- Efficient and scalable 

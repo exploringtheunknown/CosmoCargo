@@ -1,0 +1,32 @@
+{
+	"models": {
+	  "main": {
+		"provider": "ollama",
+		"modelId": "qwen2.5-coder:latest",
+		"maxTokens": 32768,
+		"temperature": 0.2
+	  },
+	  "research": {
+		"provider": "ollama",
+		"modelId": "qwen2.5-coder:latest",
+		 "maxTokens": 32768,
+		"temperature": 0.1
+	  },
+	  "fallback": {
+		"provider": "ollama",
+		"modelId": "qwen2.5-coder:latest",
+		 "maxTokens": 8096,
+		"temperature": 0.2
+	  }
+	},
+	"global": {
+	  "provider": "ollama",
+	  "logLevel": "debug",
+	  "debug": true,
+	  "defaultSubtasks": 5,
+	  "defaultPriority": "medium",
+	  "projectName": "Task Master",
+	  "ollamaBaseUrl": "http://localhost:11434",
+	  "azureOpenaiBaseUrl": "https://your-endpoint.openai.azure.com/"
+	}
+  }

@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
 
 interface ApiResponse<T> {
     data: T;
@@ -27,6 +27,17 @@ async function apiRequest<T>(
         },
     });
 
+    if (response.status === 401) {
+        if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+        }
+        return {
+            data: null as any,
+            status: 401,
+            ok: false,
+        };
+    }
+
     const data = await response.json();
     return {
         data,
@@ -51,4 +62,15 @@ export const api = {
         }),
     delete: <T>(endpoint: string) => 
         apiRequest<T>(endpoint, { method: 'DELETE' }),
+
+    // Chaos log retention endpoints
+    getChaosLogRetention: () => apiRequest<{ days: number }>("/chaos-events/log-retention", { method: 'GET' }),
+    setChaosLogRetention: (days: number) => apiRequest<{ days: number }>("/chaos-events/log-retention", { method: 'POST', body: JSON.stringify({ days }) }),
+    manualChaosLogCleanup: () => apiRequest<{ message: string }>("/chaos-events/manual-log-cleanup", { method: 'POST', body: '{}' }),
+
+    // Chaos event definitions endpoints
+    getChaosEventDefinitions: () => apiRequest<any[]>("/chaos-events/definitions", { method: 'GET' }),
+    postChaosEventDefinition: (payload: any) => apiRequest<any>("/chaos-events/definitions", { method: 'POST', body: JSON.stringify(payload) }),
+    putChaosEventDefinition: (id: string, payload: any) => apiRequest<any>(`/chaos-events/definitions/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+    deleteChaosEventDefinition: (id: string) => apiRequest<any>(`/chaos-events/definitions/${id}`, { method: 'DELETE' }),
 }; 

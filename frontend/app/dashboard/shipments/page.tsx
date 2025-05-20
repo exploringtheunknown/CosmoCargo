@@ -34,6 +34,7 @@ import {
   XCircle,
   Plane,
   Loader,
+  Zap,
 } from "lucide-react";
 import Shipment from "@/model/shipment";
 import { assignPilot, getShipments, ShipmentsFilter, updateShipmentStatus } from "@/services/shipment-service";
@@ -42,6 +43,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getStatusColorClass, getStatusDisplayText } from "@/utils/shipment-status";
 import { getPilots, PilotsFilter } from "@/services/pilot-service";
 import Pagination from "@/components/ui/pagination";
+import { api } from "@/services/api";
+import ShipmentDetailsModal from "@/components/ui/ShipmentDetailsModal";
 
 const ShipmentManagement = () => {
   const { user } = useAuth();
@@ -49,6 +52,12 @@ const ShipmentManagement = () => {
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [selectedPilot, setSelectedPilot] = useState<string>("");
   const [page, setPage] = useState(1);
+  const [showChaosDialog, setShowChaosDialog] = useState(false);
+  const [chaosLoading, setChaosLoading] = useState(false);
+  const [chaosError, setChaosError] = useState<string | null>(null);
+  const [chaosSuccess, setChaosSuccess] = useState<string | null>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailsShipment, setDetailsShipment] = useState<Shipment | null>(null);
   
   const { data: shipments, refetch, isLoading: shipmentsLoading } = useQuery({
     queryKey: ["shipments", page],
@@ -102,6 +111,21 @@ const ShipmentManagement = () => {
       );
       setShowAssignDialog(false);
       refetch();
+    }
+  };
+
+  const handleTriggerChaos = async () => {
+    if (!selectedShipment) return;
+    setChaosLoading(true);
+    setChaosError(null);
+    setChaosSuccess(null);
+    try {
+      await api.post("/chaos-events/trigger", { shipmentId: selectedShipment.id });
+      setChaosSuccess("Chaos event triggered!");
+    } catch {
+      setChaosError("Kunde inte trigga chaos event.");
+    } finally {
+      setChaosLoading(false);
     }
   };
 
@@ -210,7 +234,20 @@ const ShipmentManagement = () => {
                         Tilldela Pilot
                       </Button>
                     )}
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-yellow-600 hover:text-yellow-800"
+                      onClick={() => {
+                        setSelectedShipment(shipment);
+                        setShowChaosDialog(true);
+                      }}
+                      aria-label="Trigger Chaos Event"
+                    >
+                      <Zap className="h-4 w-4 mr-1" />
+                      Trigger Chaos
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => { setDetailsShipment(shipment); setShowDetailsModal(true); }}>
                       <Package className="h-4 w-4 mr-1" />
                       Detaljer
                     </Button>
@@ -275,6 +312,34 @@ const ShipmentManagement = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Chaos Event Dialog */}
+      <Dialog open={showChaosDialog} onOpenChange={setShowChaosDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Trigger Chaos Event</DialogTitle>
+            <DialogDescription>
+              Bekräfta att du vill trigga ett chaos event för frakt {selectedShipment?.id}.
+            </DialogDescription>
+          </DialogHeader>
+          {chaosError && <p className="text-red-500">{chaosError}</p>}
+          {chaosSuccess && <p className="text-green-600">{chaosSuccess}</p>}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowChaosDialog(false)}>
+              Avbryt
+            </Button>
+            <Button onClick={handleTriggerChaos} disabled={chaosLoading}>
+              {chaosLoading ? "Triggar..." : "Trigger Chaos Event"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <ShipmentDetailsModal
+        open={showDetailsModal}
+        onClose={() => { setShowDetailsModal(false); setDetailsShipment(null); }}
+        shipment={detailsShipment || undefined}
+      />
     </div>
   );
 };

@@ -1,21 +1,20 @@
- namespace CosmoCargo.Model.Queries
+namespace CosmoCargo.Model.Queries;
+
+public class PaginationParams
 {
-    public class PaginationParams
+    private const int MaxPageSize = 50;
+    private int _page = 1;
+    private int _pageSize = 10;
+
+    public int Page
     {
-        private const int MaxPageSize = 50;
-        private int _pageSize = 10;
-        private int _page = 1;
+        get => _page;
+        set => _page = value < 1 ? 1 : value;
+    }
 
-        public int Page
-        {
-            get => _page;
-            set => _page = value < 1 ? 1 : value;
-        }
-
-        public int PageSize
-        {
-            get => _pageSize;
-            set => _pageSize = value > MaxPageSize ? MaxPageSize : value < 1 ? 1 : value;
-        }
+    public int PageSize
+    {
+        get => _pageSize;
+        set => _pageSize = value > MaxPageSize ? MaxPageSize : value < 1 ? 1 : value;
     }
 }

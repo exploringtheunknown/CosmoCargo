@@ -1,10 +1,9 @@
-namespace CosmoCargo.Model
+namespace CosmoCargo.Model;
+
+public enum RiskLevel
 {
-    public enum RiskLevel
-    {
-        Low,
-        Medium,
-        High,
-        Critical
-    }
+    Low,
+    Medium,
+    High,
+    Critical
 }

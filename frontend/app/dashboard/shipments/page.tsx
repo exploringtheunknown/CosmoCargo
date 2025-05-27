@@ -252,7 +252,7 @@ const ShipmentManagement = () => {
                   <SelectValue placeholder="Välj en pilot" />
                 </SelectTrigger>
                 <SelectContent>
-                  {pilots?.items.filter((p) => p.available).map((pilot) => (
+                  {pilots?.items.filter((p) => p.isActive).map((pilot) => (
                     <SelectItem key={pilot.id} value={pilot.id}>
                       {pilot.name}
                     </SelectItem>

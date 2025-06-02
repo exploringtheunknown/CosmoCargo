@@ -9,6 +9,9 @@ export interface ShipmentContact {
 }
 
 export default interface Shipment {
+    origin: ShipmentContact;
+    destination: ShipmentContact;
+    pilotName: string;
     id: string;
     customerId: string;
     pilotId?: string | null;

@@ -2,12 +2,13 @@
 
 import React, { useState } from "react";
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Search, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,7 @@ const OngoingShipments = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const { data: shipments, refetch } = useQuery({
+  const { data: shipments } = useQuery({
     queryKey: ["shipments", search, status, page, pageSize],
     queryFn: () => {
       const filter: ShipmentsFilter = {
@@ -38,42 +39,33 @@ const OngoingShipments = () => {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
-    setPage(1); // Reset to first page when searching
+    setPage(1);
   };
 
   const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setStatus(e.target.value as ShipmentStatus | "");
-    setPage(1); // Reset to first page when changing status
+    setPage(1);
   };
 
   const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setPageSize(Number(e.target.value));
-    setPage(1); // Reset to first page when changing page size
-  };
-
-  const getProgressPercentage = (status: ShipmentStatus): number => {
-    switch (status) {
-      case ShipmentStatus.InTransit:
-        return 60;
-      case ShipmentStatus.Delivered:
-        return 100;
-      case ShipmentStatus.Assigned:
-        return 20;
-      default:
-        return 0;
-    }
+    setPage(1);
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-medium mb-2">Leveranser</h1>
-        <p className="text-space-text-secondary">
-          Följ dina leveranser i realtid
-        </p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-medium tracking-tight">
+            Leveranser
+          </h1>
+          <p className="text-space-text-secondary">
+            Följ dina leveranser i realtid
+          </p>
+        </div>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
+      <div className="flex flex-col md:flex-row justify-between gap-4">
         <div className="relative w-full md:w-auto md:flex-1 max-w-sm">
           <Search className="absolute left-3 top-2.5 h-5 w-5 text-space-text-secondary" />
           <Input
@@ -110,60 +102,56 @@ const OngoingShipments = () => {
             <option value={20}>20 per sida</option>
             <option value={50}>50 per sida</option>
           </select>
-
-          <Button className="space-button" onClick={() => refetch()}>
-            Uppdatera
-          </Button>
         </div>
       </div>
 
-      <div className="space-y-4">
-        {shipments?.items.map((shipment) => (
-          <Card key={shipment.id} className="space-card overflow-hidden">
-            <CardHeader className="pb-2">
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-lg font-medium">
-                    Frakt #{shipment.id}
-                  </CardTitle>
-                  <CardDescription>
-                    {shipment.sender.station + ' @ ' + shipment.sender.planet} → {shipment.receiver.station + ' @ ' + shipment.receiver.planet}
-                  </CardDescription>
-                </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
-                  {getStatusDisplayText(shipment.status)}
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-6">
-                <div className="flex justify-between mb-2 text-sm">
-                  <div>{shipment.sender.planet}</div>
-                  <div>{shipment.receiver.planet}</div>
-                </div>
-                <div className="relative pt-1">
-                  <div className="overflow-hidden h-2 text-xs flex rounded bg-space-secondary/50">
-                    <div
-                      style={{ width: `${getProgressPercentage(shipment.status)}%` }}
-                      className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-gradient-to-r from-space-accent-blue to-space-accent-purple"
-                    ></div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center">
-                <div className="text-space-text-secondary text-sm">
-                  Last: {shipment.category}
-                </div>
-                <Button size="sm" variant="outline">
-                  <Eye className="h-4 w-4 mr-2" />
-                  Visa detaljer
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {shipments && shipments.items.length > 0 ? (
+        <div className="rounded-md border border-space-secondary bg-space-primary">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>#</TableHead>
+                <TableHead>Kund</TableHead>
+                <TableHead>Ursprung</TableHead>
+                <TableHead>Destination</TableHead>
+                <TableHead>Last</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Åtgärder</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {shipments.items.map((shipment, ix) => (
+                <TableRow key={shipment.id}>
+                  <TableCell>{(page - 1) * pageSize + ix + 1}</TableCell>
+                  <TableCell>{shipment.sender.name}</TableCell>
+                  <TableCell>{shipment.sender.station + " @ " + shipment.sender.planet}</TableCell>
+                  <TableCell>{shipment.receiver.station + " @ " + shipment.receiver.planet}</TableCell>
+                  <TableCell>{shipment.category}</TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
+                      {getStatusDisplayText(shipment.status)}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <Button size="sm" variant="outline">
+                      <Eye className="h-4 w-4 mr-2" />
+                      Detaljer
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-64 border border-dashed border-space-secondary rounded-md p-8">
+          <Eye className="w-12 h-12 text-space-text-secondary mb-4" />
+          <h3 className="text-xl font-medium mb-1">Inga frakter hittades</h3>
+          <p className="text-space-text-secondary text-center">
+            Inga frakter matchar dina sökkriterier. Försök ändra filtren eller söktermer.
+          </p>
+        </div>
+      )}
 
       {shipments && shipments.totalPages > 1 && (
         <Pagination

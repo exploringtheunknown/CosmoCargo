@@ -1,4 +1,5 @@
 import { ShipmentStatus } from './types';
+import { BaseEntity } from './common';
 import User from './user';
 
 export interface ShipmentContact {
@@ -8,8 +9,7 @@ export interface ShipmentContact {
     station: string;
 }
 
-export default interface Shipment {
-    id: string;
+export default interface Shipment extends BaseEntity {
     customerId: string;
     pilotId?: string | null;
     sender: ShipmentContact;
@@ -20,7 +20,5 @@ export default interface Shipment {
     description?: string | null;
     hasInsurance: boolean;
     status: ShipmentStatus;
-    createdAt: string;
-    updatedAt: string;
     pilot?: User | null;
 }

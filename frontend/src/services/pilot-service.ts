@@ -1,5 +1,11 @@
 import { api } from "./api";
 import { PaginatedResult } from "@/model/paginated-result";
+import { 
+    CreatePilotDto, 
+    UpdatePilotDto, 
+    PilotsFilterDto, 
+    PilotAvailabilityDto 
+} from "@/model/dtos";
 
 export interface Pilot {
   id: string;
@@ -12,26 +18,7 @@ export interface Pilot {
   available?: boolean;
 }
 
-export interface PilotsFilter {
-  page?: number;
-  pageSize?: number;
-  search?: string;
-  isActive?: boolean;
-}
-
-interface CreatePilotDto {
-  name: string;
-  email: string;
-  experience: string;
-}
-
-interface UpdatePilotDto {
-  name: string;
-  email: string;
-  experience: string;
-}
-
-export const getPilots = async(filter: PilotsFilter = {}): Promise<PaginatedResult<Pilot>> => {
+export const getPilots = async(filter: PilotsFilterDto = {}): Promise<PaginatedResult<Pilot>> => {
   const queryParams = new URLSearchParams();
   
   if (filter.page) queryParams.append('page', filter.page.toString());
@@ -60,8 +47,8 @@ export const getPilotById = async(id: string): Promise<Pilot> => {
   return response.data;
 }
 
-export const getPilotAvailability = async(id: string): Promise<{isAvailable: boolean, activeShipments: number, maxShipments: number}> => {
-  const response = await api.get<{isAvailable: boolean, activeShipments: number, maxShipments: number}>(`/pilots/${id}/availability`);
+export const getPilotAvailability = async(id: string): Promise<PilotAvailabilityDto> => {
+  const response = await api.get<PilotAvailabilityDto>(`/pilots/${id}/availability`);
   
   if (!response.ok) {
     throw new Error('Kunde inte hämta pilottillgänglighet');

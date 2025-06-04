@@ -1,5 +1,11 @@
 const API_BASE_URL = 'http://localhost:5000/api';
 
+export class ApiError extends Error {
+    constructor(public status: number, public message: string, public data: unknown) {
+        super(message);
+    }
+}
+
 interface ApiResponse<T> {
     data: T;
     status: number;
@@ -17,7 +23,7 @@ async function apiRequest<T>(
             'Content-Type': 'application/json',
         },
     };
-
+    
     const response = await fetch(url, {
         ...defaultOptions,
         ...options,
@@ -28,6 +34,10 @@ async function apiRequest<T>(
     });
 
     const data = await response.json();
+    if(!response.ok) {
+        throw new ApiError(response.status, data.message, data);
+    }
+
     return {
         data,
         status: response.status,

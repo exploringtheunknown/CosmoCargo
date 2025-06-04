@@ -4,12 +4,13 @@ import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { CheckCircle, AlertCircle, Loader } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { getShipments, ShipmentsFilter, updateShipmentStatus } from "@/services/shipment-service";
+import { getShipments, updateShipmentStatus } from "@/services/shipment-service";
 import Pagination from "@/components/ui/pagination";
 import ShipmentTable from "@/components/ShipmentTable";
 import { ShipmentStatus } from "@/model/types";
 import { toast } from "sonner";
 import Shipment from "@/model/shipment";
+import { ShipmentsFilterDto } from "@/model/dtos";
 
 const AssignedShipments = () => {
   const { user } = useAuth();
@@ -18,7 +19,7 @@ const AssignedShipments = () => {
   const { data: shipments, isLoading, refetch } = useQuery({
     queryKey: ["shipments", page],
     queryFn: () => {
-      const filter: ShipmentsFilter = {
+      const filter: ShipmentsFilterDto = {
         page,
         pageSize: 10
       };

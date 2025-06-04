@@ -4,12 +4,13 @@ import React, { useState } from "react";
 import { Search, Eye } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
-import { getShipments, ShipmentsFilter } from "@/services/shipment-service";
+import { getShipments } from "@/services/shipment-service";
 import { ShipmentStatus } from "@/model/types";
 import Pagination from "@/components/ui/pagination";
 import ShipmentTable from "@/components/ShipmentTable";
 import Shipment from "@/model/shipment";
 import { toast } from "sonner";
+import { ShipmentsFilterDto } from "@/model/dtos";
 
 const OngoingShipments = () => {
   const [search, setSearch] = useState("");
@@ -20,7 +21,7 @@ const OngoingShipments = () => {
   const { data: shipments } = useQuery({
     queryKey: ["shipments", search, status, page, pageSize],
     queryFn: () => {
-      const filter: ShipmentsFilter = {
+      const filter: ShipmentsFilterDto = {
         page,
         pageSize
       };

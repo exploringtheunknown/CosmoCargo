@@ -25,7 +25,7 @@ import {
   Search,
 } from "lucide-react";
 import { useQuery } from '@tanstack/react-query';
-import { getPilots, Pilot, PilotsFilter, updatePilotStatus } from '@/services/pilot-service';
+import { getPilots, Pilot, updatePilotStatus } from '@/services/pilot-service';
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -36,11 +36,12 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Pagination from "@/components/ui/pagination";
+import { PilotsFilterDto } from "@/model/dtos";
 
 const PilotsManagement = () => {
   const { user } = useAuth();
   const router = useRouter();
-  const [filter, setFilter] = useState<PilotsFilter>({
+  const [filter, setFilter] = useState<PilotsFilterDto>({
     page: 1,
     pageSize: 10,
     search: '',

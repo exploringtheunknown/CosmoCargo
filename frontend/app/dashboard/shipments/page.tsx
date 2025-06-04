@@ -20,13 +20,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AlertCircle, Plane, Loader } from "lucide-react";
-import { assignPilot, getShipments, ShipmentsFilter, updateShipmentStatus } from "@/services/shipment-service";
+import { assignPilot, getShipments, updateShipmentStatus } from "@/services/shipment-service";
 import { useQuery } from "@tanstack/react-query";
-import { getPilots, PilotsFilter } from "@/services/pilot-service";
+import { getPilots } from "@/services/pilot-service";
 import Pagination from "@/components/ui/pagination";
 import ShipmentTable from "@/components/ShipmentTable";
 import Shipment from "@/model/shipment";
 import { ShipmentStatus } from "@/model/types";
+import { PilotsFilterDto, ShipmentsFilterDto } from "@/model/dtos";
 
 const ShipmentManagement = () => {
   const { user } = useAuth();
@@ -38,7 +39,7 @@ const ShipmentManagement = () => {
   const { data: shipments, refetch, isLoading: shipmentsLoading } = useQuery({
     queryKey: ["shipments", page],
     queryFn: () => {
-      const filter: ShipmentsFilter = {
+      const filter: ShipmentsFilterDto = {
         page,
         pageSize: 10
       };
@@ -49,7 +50,7 @@ const ShipmentManagement = () => {
   const { data: pilots } = useQuery({
     queryKey: ["pilots", page],
     queryFn: () => {
-      const filter: PilotsFilter = {
+      const filter: PilotsFilterDto = {
         page,
         pageSize: 10
       };

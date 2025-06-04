@@ -1,22 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Search, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { getShipments, ShipmentsFilter } from "@/services/shipment-service";
 import { ShipmentStatus } from "@/model/types";
-import { getStatusDisplayText, getStatusColorClass } from "@/utils/shipment-status";
 import Pagination from "@/components/ui/pagination";
+import ShipmentTable from "@/components/ShipmentTable";
+import Shipment from "@/model/shipment";
+import { toast } from "sonner";
 
 const OngoingShipments = () => {
   const [search, setSearch] = useState("");
@@ -50,6 +43,16 @@ const OngoingShipments = () => {
   const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setPageSize(Number(e.target.value));
     setPage(1);
+  };
+
+  const handleAction = (shipment: Shipment, action: string) => {
+    switch (action) {
+      case "view":
+        toast.info("Detaljvy kommer snart");
+        break;
+      default:
+        console.log("Okänd action:", action);
+    }
   };
 
   return (
@@ -106,43 +109,13 @@ const OngoingShipments = () => {
       </div>
 
       {shipments && shipments.items.length > 0 ? (
-        <div className="rounded-md border border-space-secondary bg-space-primary">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>#</TableHead>
-                <TableHead>Kund</TableHead>
-                <TableHead>Ursprung</TableHead>
-                <TableHead>Destination</TableHead>
-                <TableHead>Last</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Åtgärder</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {shipments.items.map((shipment, ix) => (
-                <TableRow key={shipment.id}>
-                  <TableCell>{(page - 1) * pageSize + ix + 1}</TableCell>
-                  <TableCell>{shipment.sender.name}</TableCell>
-                  <TableCell>{shipment.sender.station + " @ " + shipment.sender.planet}</TableCell>
-                  <TableCell>{shipment.receiver.station + " @ " + shipment.receiver.planet}</TableCell>
-                  <TableCell>{shipment.category}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
-                      {getStatusDisplayText(shipment.status)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <Button size="sm" variant="outline">
-                      <Eye className="h-4 w-4 mr-2" />
-                      Detaljer
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <ShipmentTable 
+          shipments={shipments.items} 
+          handleAction={handleAction}
+          showPagination={true}
+          currentPage={page}
+          pageSize={pageSize}
+        />
       ) : (
         <div className="flex flex-col items-center justify-center h-64 border border-dashed border-space-secondary rounded-md p-8">
           <Eye className="w-12 h-12 text-space-text-secondary mb-4" />

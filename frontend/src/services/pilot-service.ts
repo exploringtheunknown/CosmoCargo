@@ -34,12 +34,13 @@ interface UpdatePilotDto {
 export const getPilots = async(filter: PilotsFilter = {}): Promise<PaginatedResult<Pilot>> => {
   const queryParams = new URLSearchParams();
   
-  if (filter.page) queryParams.append('page', filter.page.toString());
-  if (filter.pageSize) queryParams.append('pageSize', filter.pageSize.toString());
+  queryParams.append('page', (filter.page || 1).toString());
+  queryParams.append('pageSize', (filter.pageSize || 10).toString());
+  
   if (filter.search) queryParams.append('search', filter.search);
   if (filter.isActive !== undefined) queryParams.append('isActive', filter.isActive.toString());
   
-  const url = `/pilots${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+  const url = `/pilots?${queryParams.toString()}`;
   const response = await api.get<PaginatedResult<Pilot>>(url);
   
   if (!response.ok) {

@@ -23,7 +23,7 @@ const navItems = [
     title: "Kundmeny",
     items: [
       { icon: Home, label: "Översikt", href: "/dashboard" },
-      { icon: Package, label: "Boka Frakt", href: "/dashboard/shipments/book" },
+      { icon: Package, label: "Boka Frakt", href: "/dashboard/shipments/add" },
       {
         icon: PackageCheck,
         label: "Leveranser",

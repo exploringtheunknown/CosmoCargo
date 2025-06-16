@@ -6,6 +6,29 @@ interface ApiResponse<T> {
     ok: boolean;
 }
 
+// Hämta auth token från localStorage
+const getAuthToken = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('auth-token');
+  }
+  return null;
+};
+
+// Skapa headers med auth token
+const createHeaders = (customHeaders?: Record<string, string>): Record<string, string> => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...customHeaders,
+  };
+
+  const token = getAuthToken();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  return headers;
+};
+
 async function apiRequest<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -13,9 +36,7 @@ async function apiRequest<T>(
     const url = `${API_BASE_URL}${endpoint}`;
     const defaultOptions: RequestInit = {
         credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: createHeaders(),
     };
 
     const response = await fetch(url, {

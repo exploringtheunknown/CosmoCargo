@@ -3,14 +3,6 @@
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -27,33 +19,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  AlertCircle,
-  Package,
-  CheckCircle,
-  XCircle,
-  Plane,
-  Loader,
-} from "lucide-react";
-import Shipment from "@/model/shipment";
-import { assignPilot, getShipments, ShipmentsFilter, updateShipmentStatus } from "@/services/shipment-service";
-import { ShipmentStatus } from "@/model/types";
+import { AlertCircle, Plane, Loader } from "lucide-react";
+import { assignPilot, getShipments, updateShipmentStatus } from "@/services/shipment-service";
 import { useQuery } from "@tanstack/react-query";
-import { getStatusColorClass, getStatusDisplayText } from "@/utils/shipment-status";
-import { getPilots, PilotsFilter } from "@/services/pilot-service";
+import { getPilots } from "@/services/pilot-service";
 import Pagination from "@/components/ui/pagination";
+import ShipmentTable from "@/components/ShipmentTable";
+import Shipment from "@/model/shipment";
+import { ShipmentStatus } from "@/model/types";
+import { PilotsFilterDto, ShipmentsFilterDto } from "@/model/dtos";
 
 const ShipmentManagement = () => {
   const { user } = useAuth();
   const [showAssignDialog, setShowAssignDialog] = useState(false);
-  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [selectedPilot, setSelectedPilot] = useState<string>("");
+  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
   const [page, setPage] = useState(1);
   
   const { data: shipments, refetch, isLoading: shipmentsLoading } = useQuery({
     queryKey: ["shipments", page],
     queryFn: () => {
-      const filter: ShipmentsFilter = {
+      const filter: ShipmentsFilterDto = {
         page,
         pageSize: 10
       };
@@ -64,14 +50,13 @@ const ShipmentManagement = () => {
   const { data: pilots } = useQuery({
     queryKey: ["pilots", page],
     queryFn: () => {
-      const filter: PilotsFilter = {
+      const filter: PilotsFilterDto = {
         page,
         pageSize: 10
       };
       return getPilots(filter);
     },
   });
-
 
   const handleAction = async (
     shipment: Shipment,
@@ -89,11 +74,13 @@ const ShipmentManagement = () => {
   };
 
   const confirmAction = async (action: "assign") => {
-    if (!selectedShipment) return;
-
     if (action === "assign") {
       if (!selectedPilot) {
         toast.error("Välj en pilot först");
+        return;
+      }
+      if (!selectedShipment) {
+        toast.error("Välj en frakt först");
         return;
       }
       await assignPilot(selectedShipment.id, {pilotId: selectedPilot});
@@ -137,90 +124,7 @@ const ShipmentManagement = () => {
         </div>
       )}
       
-      <div className="rounded-md border border-space-secondary bg-space-primary">
-        <Table>
-          <TableHeader>
-            <TableRow>
-            <TableHead>#</TableHead>
-              <TableHead>Kund</TableHead>
-              <TableHead>Ursprung</TableHead>
-              <TableHead>Destination</TableHead>
-              <TableHead>Last</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Pilot</TableHead>
-              <TableHead>Åtgärder</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {shipments?.items.map((shipment, ix) => (
-              <TableRow key={shipment.id}>
-                <TableCell>{ix + 1}</TableCell>
-                <TableCell>{shipment.sender.name}</TableCell>
-                <TableCell>{shipment.sender.station + " @ " + shipment.sender.planet}</TableCell>
-                <TableCell>{shipment.receiver.station + " @ " + shipment.receiver.planet}</TableCell>
-                <TableCell>{shipment.category}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
-                    {getStatusDisplayText(shipment.status)}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {shipment.pilot ? (
-                    <div className="flex items-center gap-1">
-                      <Plane className="h-4 w-4 text-space-accent-purple" />
-                      {shipment.pilot.name}
-                    </div>
-                  ) : (
-                    <span className="text-space-text-secondary">
-                      Inte tilldelad
-                    </span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    {shipment.status === ShipmentStatus.WaitingForApproval && (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-green-500 hover:text-green-700"
-                          onClick={() => handleAction(shipment, "approve")}
-                        >
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                          Godkänn
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-red-500 hover:text-red-700"
-                          onClick={() => handleAction(shipment, "denied")}
-                        >
-                          <XCircle className="h-4 w-4 mr-1" />
-                          Neka
-                        </Button>
-                      </>
-                    )}
-                    {shipment.status === ShipmentStatus.Approved && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleAction(shipment, "assign")}
-                      >
-                        <Plane className="h-4 w-4 mr-1" />
-                        Tilldela Pilot
-                      </Button>
-                    )}
-                    <Button variant="outline" size="sm">
-                      <Package className="h-4 w-4 mr-1" />
-                      Detaljer
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <ShipmentTable shipments={shipments?.items || []} handleAction={(shipment, action) => handleAction(shipment, action as "approve" | "denied" | "assign")} />
 
       {shipments && shipments.totalPages > 1 && (
         <Pagination

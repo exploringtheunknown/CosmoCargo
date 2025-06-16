@@ -2,31 +2,24 @@
 
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { CheckCircle, AlertCircle, Loader } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { ShipmentStatus } from "@/model/types";
-import { getShipments, ShipmentsFilter, updateShipmentStatus } from "@/services/shipment-service";
-import { getStatusDisplayText, getStatusColorClass } from "@/utils/shipment-status";
+import { getShipments, updateShipmentStatus } from "@/services/shipment-service";
 import Pagination from "@/components/ui/pagination";
+import ShipmentTable from "@/components/ShipmentTable";
+import { ShipmentStatus } from "@/model/types";
+import { toast } from "sonner";
+import Shipment from "@/model/shipment";
+import { ShipmentsFilterDto } from "@/model/dtos";
 
 const AssignedShipments = () => {
   const { user } = useAuth();
   const [page, setPage] = useState(1);
   
-  const { data: shipments, refetch, isLoading } = useQuery({
+  const { data: shipments, isLoading, refetch } = useQuery({
     queryKey: ["shipments", page],
     queryFn: () => {
-      const filter: ShipmentsFilter = {
+      const filter: ShipmentsFilterDto = {
         page,
         pageSize: 10
       };
@@ -47,12 +40,43 @@ const AssignedShipments = () => {
     );
   }
 
-  const handleUpdateStatus = async (shipmentId: string, newStatus: ShipmentStatus) => {
-    await updateShipmentStatus(shipmentId, { status: newStatus });
-    toast.success(
-      `Status uppdaterad för frakt ${shipmentId} till ${getStatusDisplayText(newStatus)}`
-    );
-    refetch();
+  const handleAction = async (shipment: Shipment, action: string) => {
+    try {
+      switch (action) {
+        case "start-transport":
+          await updateShipmentStatus(shipment.id, { status: ShipmentStatus.InTransit });
+          toast.success(
+            `Frakt ${shipment.id} har påbörjat transport`
+          );
+          refetch();
+          break;
+        
+        case "mark-delivered":
+          await updateShipmentStatus(shipment.id, { status: ShipmentStatus.Delivered });
+          toast.success(
+            `Frakt ${shipment.id} har markerats som levererad`
+          );
+          refetch();
+          break;
+        
+        case "assign-to-me":
+          // Här skulle du kunna lägga till logik för att tilldela frakten till sig själv
+          // await assignShipmentToPilot(shipment.id, user.id);
+          toast.info("Funktionalitet för att tilldela frakt kommer snart");
+          break;
+        
+        case "view":
+          // Här skulle du kunna navigera till en detaljsida
+          toast.info("Detaljvy kommer snart");
+          break;
+        
+        default:
+          console.log("Okänd action:", action);
+      }
+    } catch (error) {
+      toast.error("Ett fel uppstod vid uppdatering av frakt");
+      console.error("Error updating shipment:", error);
+    }
   };
 
   return (
@@ -69,63 +93,13 @@ const AssignedShipments = () => {
       </div>
 
       {shipments && shipments.items.length > 0 ? (
-        <div className="rounded-md border border-space-secondary bg-space-primary">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>#</TableHead>
-                <TableHead>Kund</TableHead>
-                <TableHead>Ursprung</TableHead>
-                <TableHead>Destination</TableHead>
-                <TableHead>Last</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Åtgärder</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {shipments.items.map((shipment, ix) => (
-                <TableRow key={shipment.id}>
-                  <TableCell>{ix + 1}</TableCell>
-                  <TableCell>{shipment.sender.name}</TableCell>
-                  <TableCell>{shipment.sender.station + " @ " + shipment.sender.planet}</TableCell>
-                  <TableCell>{shipment.receiver.station + " @ " + shipment.receiver.planet}</TableCell>
-                  <TableCell>{shipment.category}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColorClass(shipment.status)}`}>
-                      {getStatusDisplayText(shipment.status)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      {shipment.status === "Assigned" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleUpdateStatus(shipment.id, ShipmentStatus.InTransit)
-                          }
-                        >
-                          Påbörja Transport
-                        </Button>
-                      )}
-                      {shipment.status === "InTransit" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleUpdateStatus(shipment.id, ShipmentStatus.Delivered)
-                          }
-                        >
-                          Markera Levererad
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <ShipmentTable 
+          shipments={shipments.items} 
+          handleAction={handleAction}
+          showPagination={true}
+          currentPage={page}
+          pageSize={10}
+        />
       ) : isLoading ? (
         <div className="flex flex-col items-center justify-center h-64 p-8">
           <Loader className="w-12 h-12 text-space-text-secondary mb-4 animate-spin" />

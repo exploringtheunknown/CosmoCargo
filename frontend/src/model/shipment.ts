@@ -10,6 +10,9 @@ export interface ShipmentContact {
 }
 
 export default interface Shipment extends BaseEntity {
+    origin: ShipmentContact;
+    destination: ShipmentContact;
+    pilotName: string;
     customerId: string;
     pilotId?: string | null;
     sender: ShipmentContact;

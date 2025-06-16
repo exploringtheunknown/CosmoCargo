@@ -1,7 +1,7 @@
 export enum UserRole {
-    Customer = 'Customer',
-    Pilot = 'Pilot',
-    Admin = 'Admin'
+    Customer = "customer",
+    Pilot = "pilot",
+    Admin = "admin"
 }
 
 export enum ShipmentStatus {

@@ -23,5 +23,7 @@ export default interface Shipment extends BaseEntity {
     description?: string | null;
     hasInsurance: boolean;
     status: ShipmentStatus;
+    createdAt: string;
+    updatedAt: string;
     pilot?: User | null;
 }
